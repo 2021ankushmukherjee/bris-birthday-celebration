@@ -1,7 +1,8 @@
 export const birthday = {
   name: process.env.NEXT_PUBLIC_BIRTHDAY_PERSON_NAME || "Bristi",
   date: process.env.NEXT_PUBLIC_BIRTH_DATE || "11-20",
-  countdownEnabled: process.env.NEXT_PUBLIC_COUNTDOWN_ENABLED !== "false",
+  // The surprise is locked until local midnight by default. Set this to true only for previews.
+  countdownEnabled: process.env.NEXT_PUBLIC_COUNTDOWN_NOT_ENABLED !== "true",
   greeting: `Happy Birthday, ${process.env.NEXT_PUBLIC_BIRTHDAY_PERSON_NAME || "Bristi"}. 🎂❤️`,
   intro: "Someone has created a little world, just for you.",
   letter: `Today is a celebration of the gentleness you bring into ordinary moments, the light in your smile, and all the wonderful dreams still waiting for you. I hope this year meets you with the same kindness, warmth, and magic you give so freely. May every new day remind you how deeply you deserve to be cherished. Happy birthday, beautiful.`,
