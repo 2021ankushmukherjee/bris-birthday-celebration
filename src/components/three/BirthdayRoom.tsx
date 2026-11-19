@@ -10,23 +10,67 @@ function Balloon({ position, color }: { position: [number, number, number]; colo
   useFrame(({ clock }) => { if (ref.current) ref.current.position.y = position[1] + Math.sin(clock.elapsedTime + position[0]) * .12; });
   return <group ref={ref} position={position}><mesh><sphereGeometry args={[.34, 24, 24]} /><meshStandardMaterial color={color} roughness={.35} /></mesh><mesh position={[0, -.43, 0]}><cylinderGeometry args={[.008, .008, .42, 8]} /><meshStandardMaterial color="#d7b16b" /></mesh></group>;
 }
-function Cake({ lit, onCake }: { lit: boolean; onCake: () => void }) {
-  return <group onClick={(e) => { e.stopPropagation(); onCake(); }} position={[0, -1.1, 0]}>
+
+const heartShape = new THREE.Shape();
+heartShape.moveTo(0, -.28); heartShape.bezierCurveTo(-.55, .1, -.38, .5, 0, .22); heartShape.bezierCurveTo(.38, .5, .55, .1, 0, -.28);
+function HeartBalloon({ position, color }: { position: [number, number, number]; color: string }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => { if (ref.current) { ref.current.position.y = position[1] + Math.sin(clock.elapsedTime * 1.2 + position[0]) * .1; ref.current.rotation.z = Math.sin(clock.elapsedTime + position[0]) * .05; } });
+  return <group ref={ref} position={position}><mesh scale={[.62, .62, .62]}><shapeGeometry args={[heartShape]} /><meshStandardMaterial color={color} emissive={color} emissiveIntensity={.12} roughness={.28} metalness={.12} side={THREE.DoubleSide} /></mesh><mesh position={[0, -.56, 0]}><cylinderGeometry args={[.008, .008, .5, 8]} /><meshStandardMaterial color="#d7b16b" /></mesh></group>;
+}
+
+function RosePetals() {
+  const petals = Array.from({ length: 42 }, (_, index) => { const angle = index * 2.42; const radius = .56 + (index % 6) * .12; return { x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, rotation: angle * 1.7, color: index % 5 < 3 ? "#c93456" : index % 5 === 3 ? "#e95775" : "#f6a0b4" }; });
+  return <group position={[0, -.66, .04]}>{petals.map((petal, index) => <mesh key={index} position={[petal.x, .012, petal.z]} rotation={[-Math.PI / 2, 0, petal.rotation]} scale={[1, .65, 1]}><circleGeometry args={[.065, 14]} /><meshStandardMaterial color={petal.color} roughness={.55} side={THREE.DoubleSide} /></mesh>)}</group>;
+}
+
+function Cake({ lit, cut }: { lit: boolean; cut: boolean }) {
+  return <group position={[0, -1.1, 0]}>
     {[{ r: 1.05, y: 0 }, { r: .77, y: .42 }, { r: .5, y: .78 }].map((x) => <mesh key={x.y} position={[0, x.y, 0]} castShadow><cylinderGeometry args={[x.r, x.r * 1.08, .42, 48]} /><meshStandardMaterial color="#f7c5d2" roughness={.55} /></mesh>)}
     {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y]) => <group key={x} position={[x, y, 0]}><mesh><cylinderGeometry args={[.035, .035, .34, 12]} /><meshStandardMaterial color="#ffd782" emissive="#8b4e20" /></mesh>{lit && <pointLight color="#ffbf54" intensity={2} distance={2} />}{lit && <mesh position={[0, .24, 0]}><sphereGeometry args={[.09, 12, 12]} /><meshBasicMaterial color="#fff2a8" /></mesh>}</group>)}
-    <Text position={[0, 1.48, 0]} fontSize={.2} color="#b17932" anchorX="center">MAKE A WISH</Text>
+    {cut && <><mesh position={[.52, .42, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.44, .42, .5]} /><meshStandardMaterial color="#f7c5d2" roughness={.55} /></mesh><mesh position={[.52, .64, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.45, .025, .51]} /><meshStandardMaterial color="#fff0d6" /></mesh><Text position={[0, 1.72, 0]} fontSize={.16} color="#ffe7a4" anchorX="center">A SLICE FOR THE BIRTHDAY GIRL</Text></>}
   </group>;
 }
-export default function BirthdayRoom({ lit, onCake }: { lit: boolean; onCake: () => void }) {
- return <Canvas shadows camera={{ position: [0, 1.3, 6.6], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
-   <color attach="background" args={["#100d2a"]} /><fog attach="fog" args={["#100d2a", 7, 16]} />
-   <ambientLight intensity={.75} /><pointLight position={[0, 4, 2]} intensity={lit ? 55 : 20} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={13} color="#bfa9ff" distance={6} />
-   <mesh position={[0, -1.55, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 14]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
-   <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[12, 7]} /><meshStandardMaterial color="#241d3e" /></mesh>
-   <mesh position={[0, -.75, .1]}><cylinderGeometry args={[1.45, 1.45, .14, 48]} /><meshStandardMaterial color="#d4a95f" metalness={.65} roughness={.25} /></mesh>
-   <Cake lit={lit} onCake={onCake} /><Sparkles count={70} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
-   <Float speed={1.4} floatIntensity={.45}><Balloon position={[-2.6, 1.5, -1]} color="#f4aac2" /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={[2.6, 1.1, -1]} color="#c8b1f4" /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={[3.3, 2.2, -1]} color="#ffd18c" /></Float>
-   <Text position={[0, 2.8, -2.35]} fontSize={.5} color="#f9deb0" anchorX="center">HAPPY BIRTHDAY</Text>
-   <OrbitControls enablePan={false} minDistance={4.3} maxDistance={8} maxPolarAngle={Math.PI / 2.05} />
- </Canvas>;
+
+function Diya({ position, on }: { position: [number, number, number]; on: boolean }) {
+  return <group position={position}><mesh><cylinderGeometry args={[.15, .1, .07, 24]} /><meshStandardMaterial color="#c96a2a" metalness={.45} roughness={.3} /></mesh><mesh position={[0, .055, 0]}><sphereGeometry args={[.12, 20, 12]} /><meshStandardMaterial color="#f1a24c" emissive={on ? "#f08a28" : "#000000"} emissiveIntensity={on ? 2 : 0} /></mesh>{on && <><pointLight position={[0, .22, 0]} color="#ffb655" intensity={1.3} distance={2.3} /><mesh position={[0, .19, 0]} scale={[.55, 1.15, .55]}><sphereGeometry args={[.1, 14, 14]} /><meshBasicMaterial color="#fff1a5" /></mesh></>}</group>;
+}
+
+function DiwaliLights({ on }: { on: boolean }) {
+  const colors = ["#fff2ad", "#f6b8b7", "#d8c2ff", "#c8f0ec", "#ffe09a", "#f9c9d7"];
+  const ceilingBulbs = [-4.15, -3.1, -2.05, -.95, .1, 1.15, 2.15, 3.15, 4.05];
+  const lanterns = [-3.35, -2.85, 2.85, 3.35];
+  return <group><group position={[0, 3.18, -1.82]}>{ceilingBulbs.map((x, index) => <Float key={x} speed={1.1 + index * .07} floatIntensity={.08}><group position={[x, index % 2 ? -.08 : .04, 0]}><mesh><sphereGeometry args={[.115, 16, 16]} /><meshStandardMaterial color={on ? colors[index % colors.length] : "#413956"} emissive={on ? colors[index % colors.length] : "#000000"} emissiveIntensity={on ? 2.8 : 0} /></mesh>{on && <pointLight color={colors[index % colors.length]} intensity={.65} distance={1.5} />}</group></Float>)}</group><group position={[0, 1.66, -2.18]}>{lanterns.map((x, index) => <Float key={x} speed={1.15 + index * .1} floatIntensity={.08}><group position={[x, index % 2 ? .12 : -.05, 0]}><mesh position={[0, .23, -.015]}><cylinderGeometry args={[.018, .018, .55, 8]} /><meshStandardMaterial color="#d7a24d" /></mesh><mesh><boxGeometry args={[.2, .3, .07]} /><meshStandardMaterial color={on ? "#c8494e" : "#332c45"} emissive={on ? "#7f202c" : "#000000"} emissiveIntensity={on ? 1.2 : 0} /></mesh><mesh position={[0, 0, .045]}><sphereGeometry args={[.052, 12, 12]} /><meshBasicMaterial color={on ? "#ffe4a4" : "#4a4159"} /></mesh>{on && <pointLight color="#ffba67" intensity={.85} distance={1.7} />}</group></Float>)}</group><Diya position={[-2.25, -1.4, -1.5]} on={on} /><Diya position={[-1.65, -1.4, -1.6]} on={on} /><Diya position={[1.65, -1.4, -1.6]} on={on} /><Diya position={[2.25, -1.4, -1.5]} on={on} /></group>;
+}
+
+function WallCelebration({ name, lit }: { name: string; lit: boolean }) {
+  const flowers = [
+    [-2.55, .42], [-2.68, .13], [-2.55, -.16], [2.55, .42], [2.68, .13], [2.55, -.16],
+  ] as const;
+  return <group position={[0, 2.02, -2.43]}><mesh><planeGeometry args={[5.55, 1.35]} /><meshStandardMaterial color="#321d4a" emissive={lit ? "#1d0d30" : "#000000"} emissiveIntensity={lit ? .8 : 0} /></mesh><mesh position={[0, .72, .01]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh position={[0, -.72, .01]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh>{flowers.map(([x, y], index) => <group key={`${x}-${y}`} position={[x, y, .04]}><mesh rotation={[0, 0, index * .6]}><torusGeometry args={[.09, .026, 10, 18]} /><meshStandardMaterial color={index % 2 ? "#f4a42b" : "#e76775"} emissive={lit ? (index % 2 ? "#9c4b0d" : "#841d32") : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh><sphereGeometry args={[.035, 10, 10]} /><meshBasicMaterial color="#ffe3a2" /></mesh></group>)}<Text position={[0, .23, .06]} fontSize={.36} color="#ffdda0" anchorX="center" letterSpacing={.08}>HAPPY BIRTHDAY</Text><Text position={[0, -.28, .06]} fontSize={.5} color="#fff2dc" anchorX="center" maxWidth={5} lineHeight={.9}>{name.toUpperCase()}</Text><Text position={[0, -.55, .06]} fontSize={.105} color="#f6c574" anchorX="center" letterSpacing={.15}>A NIGHT MADE JUST FOR YOU</Text></group>;
+}
+
+function Confetti({ index }: { index: number }) {
+  const ref = useRef<THREE.Mesh>(null), startedAt = useRef<number | null>(null);
+  const angle = index * 2.4, speed = 1.1 + (index % 7) * .1, lift = 4.05 + (index % 5) * .22;
+  useFrame(({ clock }) => { if (!ref.current) return; if (startedAt.current === null) startedAt.current = clock.elapsedTime; const time = clock.elapsedTime - startedAt.current; ref.current.position.set(Math.cos(angle) * speed * time, lift * time - 1.6 * time * time, Math.sin(angle) * .42 * time); ref.current.rotation.set(angle + time * 7, angle / 2 + time * 4, time * 8); });
+  return <mesh ref={ref}><boxGeometry args={[.035, .22, .02]} /><meshBasicMaterial color={["#ff7199", "#ffd56f", "#b99cff", "#8ee6d2", "#ef4965"][index % 5]} /></mesh>;
+}
+
+function PartyBurst({ active }: { active: boolean }) {
+  if (!active) return null;
+  return <group position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={index} index={index} />)}</group>;
+}
+
+export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, popperBurst }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; popperBurst: boolean }) {
+  return <Canvas shadows camera={{ position: [0, 1.3, 6.6], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
+    <color attach="background" args={[roomLit ? "#100d2a" : "#070617"]} /><fog attach="fog" args={[roomLit ? "#100d2a" : "#070617", 7, 16]} />
+    <ambientLight intensity={roomLit ? .75 : .12} /><pointLight position={[0, 4, 2]} intensity={roomLit ? 55 : 3} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={roomLit ? 13 : 1} color="#bfa9ff" distance={6} /><pointLight position={[3, 2, -1]} intensity={roomLit ? 10 : 0} color="#f2a3c0" distance={5} />
+    <mesh position={[0, -1.55, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 14]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
+    <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[12, 7]} /><meshStandardMaterial color="#241d3e" /></mesh>
+    <mesh position={[0, -.75, .1]}><cylinderGeometry args={[1.45, 1.45, .14, 48]} /><meshStandardMaterial color="#d4a95f" metalness={.65} roughness={.25} /></mesh>
+    <Cake lit={candlesLit} cut={cakeCut} /><RosePetals /><DiwaliLights on={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
+    <Float speed={1.4} floatIntensity={.45}><Balloon position={[-3.5, .55, -.8]} color="#f4aac2" /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={[3.45, .35, -.8]} color="#c8b1f4" /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={[3.65, 2.2, -.95]} color="#ffd18c" /></Float><HeartBalloon position={[-3.45, 2.1, -.8]} color="#ee6f94" /><HeartBalloon position={[3.35, 1.55, -.8]} color="#f56e87" />
+    <OrbitControls enablePan={false} minDistance={4.3} maxDistance={8} maxPolarAngle={Math.PI / 2.05} />
+  </Canvas>;
 }
