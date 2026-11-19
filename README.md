@@ -13,7 +13,7 @@ Open `http://localhost:3000`. Production validation/export is `npm run build`, w
 
 ## Personalize
 
-All copy, the display name, birthday letter, wishes, finale, and music filename are centralized in `src/config/birthday.ts`. Update that one file rather than the scene components. Copy `.env.example` to `.env.local` to set the birthday name, `MM-DD` birthday date, and whether the browser-local countdown screen is enabled. When enabled, the countdown is a strict gate: the surprise becomes available only at midnight in the visitor's local time on the birthday. These `NEXT_PUBLIC_*` variables are embedded at build time, so rebuild after changing them.
+All copy, the display name, birthday letter, wishes, finale, and music filename are centralized in `src/config/birthday.ts`. Update that one file rather than the scene components. Copy `.env.example` to `.env.local` to set the birthday name and `MM-DD` birthday date. The browser-local countdown is enabled by default and is a strict gate: the surprise becomes available only at midnight in the visitor's local time on the birthday. For a developer preview, set `NEXT_PUBLIC_COUNTDOWN_NOT_ENABLED=true`; otherwise leave it unset or `false`. These `NEXT_PUBLIC_*` variables are embedded at build time, so rebuild after changing them.
 
 Put JPEG, PNG, or WebP photos in `public/assets/` (or move them into `public/assets/photos/`) and update the `photoPaths` list in that same config. The current supplied photos are already wired in, encoded safely for filenames with spaces, and displayed with `object-fit: contain` in the featured viewer.
 
