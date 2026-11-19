@@ -1,6 +1,6 @@
 export const birthday = {
   name: process.env.NEXT_PUBLIC_BIRTHDAY_PERSON_NAME || "Bristi",
-  date: process.env.NEXT_PUBLIC_BIRTH_DATE || "11-19",
+  date: process.env.NEXT_PUBLIC_BIRTH_DATE || "11-20",
   countdownEnabled: process.env.NEXT_PUBLIC_COUNTDOWN_ENABLED !== "false",
   greeting: `Happy Birthday, ${process.env.NEXT_PUBLIC_BIRTHDAY_PERSON_NAME || "Bristi"}. 🎂❤️`,
   intro: "Someone has created a little world, just for you.",
@@ -11,4 +11,4 @@ export const birthday = {
   music: "/assets/music/birthday.mp3",
 };
 
-export const photoPaths = ["WhatsApp Image 2026-11-15 at 00.02.02.jpeg", "WhatsApp Image 2026-11-19 at 22.42.27.jpeg", "WhatsApp Image 2026-11-19 at 22.42.30.jpeg", "WhatsApp Image 2026-10-20 at 22.55.21.jpeg", "WhatsApp Image 2026-10-16 at 22.25.56.jpeg", "WhatsApp Image 2026-10-18 at 23.30.16.jpeg", "WhatsApp Image 2026-10-24 at 16.03.37.jpeg", "WhatsApp Image 2026-10-20 at 22.55.29.jpeg", "WhatsApp Image 2026-11-14 at 22.45.54.jpeg", "WhatsApp Image 2026-11-19 at 22.42.29.jpeg", "WhatsApp Image 2026-11-19 at 22.42.28.jpeg", "WhatsApp Image 2026-10-20 at 22.55.23.jpeg"].map((file, index) => ({ src: `/assets/${file}`, caption: ["A beautiful little moment", "A smile worth celebrating", "Golden memories", "Made of magic"][index % 4] }));
+export const photoPaths = ["WhatsApp Image 2026-11-15 at 00.02.02.jpeg", "WhatsApp Image 2026-11-19 at 22.42.27.jpeg", "WhatsApp Image 2026-11-19 at 22.42.30.jpeg", "WhatsApp Image 2026-10-20 at 22.55.21.jpeg", "WhatsApp Image 2026-10-16 at 22.25.56.jpeg", "WhatsApp Image 2026-10-18 at 23.30.16.jpeg", "WhatsApp Image 2026-10-24 at 16.03.37.jpeg", "WhatsApp Image 2026-10-20 at 22.55.29.jpeg", "WhatsApp Image 2026-11-14 at 22.45.54.jpeg", "WhatsApp Image 2026-11-19 at 22.42.29.jpeg", "WhatsApp Image 2026-11-19 at 22.42.28.jpeg", "WhatsApp Image 2026-10-20 at 22.55.23.jpeg"].map((file, index) => ({ src: `/assets/${file}`, caption: [`${birthday.name}'s beautiful smile`, `A radiant moment for ${birthday.name}`, `${birthday.name} in her golden glow`, `Made of magic — ${birthday.name}`][index % 4] }));
