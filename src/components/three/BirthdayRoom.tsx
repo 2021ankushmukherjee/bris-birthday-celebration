@@ -21,13 +21,13 @@ function HeartBalloon({ position, color }: { position: [number, number, number];
 
 function RosePetals() {
   const petals = Array.from({ length: 42 }, (_, index) => { const angle = index * 2.42; const radius = .56 + (index % 6) * .12; return { x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, rotation: angle * 1.7, color: index % 5 < 3 ? "#c93456" : index % 5 === 3 ? "#e95775" : "#f6a0b4" }; });
-  return <group position={[0, -.66, .04]}>{petals.map((petal, index) => <mesh key={index} position={[petal.x, .012, petal.z]} rotation={[-Math.PI / 2, 0, petal.rotation]} scale={[1, .65, 1]}><circleGeometry args={[.065, 14]} /><meshStandardMaterial color={petal.color} roughness={.55} side={THREE.DoubleSide} /></mesh>)}</group>;
+  return <group position={[0, -.66, .04]}>{petals.map((petal, index) => <mesh key={`petal-${index}`} position={[petal.x, .012, petal.z]} rotation={[-Math.PI / 2, 0, petal.rotation]} scale={[1, .65, 1]}><circleGeometry args={[.065, 14]} /><meshStandardMaterial color={petal.color} roughness={.55} side={THREE.DoubleSide} /></mesh>)}</group>;
 }
 
 function Cake({ lit, cut }: { lit: boolean; cut: boolean }) {
   return <group position={[0, -1.1, 0]}>
-    {[{ r: 1.05, y: 0 }, { r: .77, y: .42 }, { r: .5, y: .78 }].map((x) => <mesh key={x.y} position={[0, x.y, 0]} castShadow><cylinderGeometry args={[x.r, x.r * 1.08, .42, 48]} /><meshStandardMaterial color="#f7c5d2" roughness={.55} /></mesh>)}
-    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y]) => <group key={x} position={[x, y, 0]}><mesh><cylinderGeometry args={[.035, .035, .34, 12]} /><meshStandardMaterial color="#ffd782" emissive="#8b4e20" /></mesh>{lit && <pointLight color="#ffbf54" intensity={2} distance={2} />}{lit && <mesh position={[0, .24, 0]}><sphereGeometry args={[.09, 12, 12]} /><meshBasicMaterial color="#fff2a8" /></mesh>}</group>)}
+    {[{ r: 1.05, y: 0 }, { r: .77, y: .42 }, { r: .5, y: .78 }].map((x, index) => <mesh key={`cake-tier-${index}`} position={[0, x.y, 0]} castShadow><cylinderGeometry args={[x.r, x.r * 1.08, .42, 48]} /><meshStandardMaterial color="#f7c5d2" roughness={.55} /></mesh>)}
+    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]}><mesh><cylinderGeometry args={[.035, .035, .34, 12]} /><meshStandardMaterial color="#ffd782" emissive="#8b4e20" /></mesh>{lit && <pointLight color="#ffbf54" intensity={2} distance={2} />}{lit && <mesh position={[0, .24, 0]}><sphereGeometry args={[.09, 12, 12]} /><meshBasicMaterial color="#fff2a8" /></mesh>}</group>)}
     {cut && <><mesh position={[.52, .42, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.44, .42, .5]} /><meshStandardMaterial color="#f7c5d2" roughness={.55} /></mesh><mesh position={[.52, .64, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.45, .025, .51]} /><meshStandardMaterial color="#fff0d6" /></mesh><Text position={[0, 1.72, 0]} fontSize={.16} color="#ffe7a4" anchorX="center">A SLICE FOR THE BIRTHDAY GIRL</Text></>}
   </group>;
 }
@@ -59,7 +59,7 @@ function Confetti({ index }: { index: number }) {
 
 function PartyBurst({ active, pulse }: { active: boolean; pulse: number }) {
   if (!active) return null;
-  return <group key={pulse} position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={index} index={index} />)}</group>;
+  return <group key={`party-burst-${pulse}`} position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={`confetti-${pulse}-${index}`} index={index} />)}</group>;
 }
 
 export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, popperBurst, popperPulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; popperBurst: boolean; popperPulse: number }) {
