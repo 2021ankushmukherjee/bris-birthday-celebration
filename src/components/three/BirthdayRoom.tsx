@@ -120,7 +120,7 @@ function Cake({ lit, cut, flavor, shape, tiers, candles }: { lit: boolean; cut: 
     {levels.map((level, index) => <group key={`cake-tier-${index}`} position={[0, level.y, 0]}><CakeLayer shape={shape} size={level.r} height={level.height} frosting={style.frosting} filling={style.filling} /></group>)}
     {candlePositions.map(([x, y], index) => <group key={`candle-${index}`} position={[x, y + .02 * candleScale, 0]} scale={[candleScale, candleScale, candleScale]}><mesh position={[0, .17, 0]}><cylinderGeometry args={[.062, .062, .34, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .17, .063]}><boxGeometry args={[.016, .3, .012]} /><meshBasicMaterial color="#fff4bf" /></mesh><mesh position={[0, .345, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.064, .011, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .4, 0]} color="#ff9d35" intensity={2.7} distance={2.4} /><CandleFlame index={index} tipY={.36} /></> : <><CandleSmoke index={index} puff={0} tipY={.4} /><CandleSmoke index={index} puff={1} tipY={.4} /></>}</group>)}
     {cut && <ServedCakeSlice tiers={tiers} frosting={style.frosting} filling={style.filling} />}
-    {cut && <Text position={[0, topY + .68, .32]} fontSize={.12} color="#ffe7a4" anchorX="center" letterSpacing={.06}>A SLICE FOR THE BIRTHDAY GIRL</Text>}
+    {cut && <Text position={[0, topY + .68, .32]} fontSize={.12} color="#ffe7a4" anchorX="center" letterSpacing={.06}>A SLICE FOR OUR BIRTHDAY FRIEND</Text>}
   </group>;
 }
 
