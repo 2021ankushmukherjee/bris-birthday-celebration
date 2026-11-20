@@ -3,7 +3,7 @@
 | Collection | Authoritative location | Count | Notes |
 | --- | --- | ---: | --- |
 | Birthday copy, date, music path | `src/features/celebration/data/birthday.ts` | 1 object | Values read `NEXT_PUBLIC_*` variables at build time. |
-| Gallery photos | `src/features/celebration/data/birthday.ts` | 7 | Public asset filenames and display order are preserved. |
+| Gallery photos | `src/features/celebration/data/birthday.ts` | 7 | Files live in `public/assets/photos/`; their display order is preserved. |
 | Cake flavours | `src/features/cakes/data/cake-options.ts` | 6 | Each option supplies its exact ID, display copy, swatch, frosting and filling colours. |
 | Cake shapes | `src/features/cakes/data/cake-options.ts` | 4 | `heart` has the one-candle constraint. |
 | Tier choices | `src/features/cakes/data/cake-options.ts` | 3 | IDs are 1, 2, and 3. |

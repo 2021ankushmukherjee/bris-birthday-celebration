@@ -2,7 +2,7 @@
 
 ## Scope
 
-This was a safe domain-organization refactor. The rendered component hierarchy, JSX, CSS, state ownership, animation timings, asset paths, and public content remain unchanged.
+This was a safe domain-organization refactor. The rendered component hierarchy, JSX, CSS, state ownership, animation timings, and public content remain unchanged. Public files are now organized by role, and every rendered asset reference was updated to its new location.
 
 ## Changes
 
@@ -10,6 +10,7 @@ This was a safe domain-organization refactor. The rendered component hierarchy, 
 - Moved cake unions and option interfaces into `src/features/cakes/types/cake.types.ts`.
 - Moved birthday copy and gallery data from `src/config/birthday.ts` to `src/features/celebration/data/birthday.ts`.
 - Replaced repeated environment-name interpolation with a single local `birthdayName` value while preserving every computed string.
+- Organized public files into `assets/photos/`, `assets/avatars/`, and `assets/icons/`; retained `.nojekyll` and the App Router `icon.svg` at the public root.
 - Updated component and README imports, then added repository/architecture/data documentation.
 
 ## Data-integrity check

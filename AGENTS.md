@@ -30,7 +30,7 @@ This is a Next.js 16 App Router, TypeScript, static-export birthday experience. 
 
 ### Static export and Pages deployment
 
-`next.config.ts` must retain `output: "export"`, `trailingSlash: true`, `images.unoptimized`, and the environment-derived `basePath`/`assetPrefix`. Public assets must be passed through `assetUrl()` so they work at GitHub Pages repository subpaths. The deployment workflow sets `NEXT_PUBLIC_BASE_PATH` to the repository name.
+`next.config.ts` must retain `output: "export"`, `trailingSlash: true`, `images.unoptimized`, and the environment-derived `basePath`/`assetPrefix`. Public assets must be passed through `assetUrl()` so they work at GitHub Pages repository subpaths. Store photographs in `public/assets/photos/`, portraits in `public/assets/avatars/`, optional music in `public/assets/music/`, and generic static SVGs in `public/assets/icons/`. Keep `.nojekyll` and App Router `icon.svg` at the public root. The deployment workflow sets `NEXT_PUBLIC_BASE_PATH` to the repository name.
 
 ### Validation
 

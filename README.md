@@ -15,7 +15,7 @@ Open `http://localhost:3000`. Production validation/export is `npm run build`, w
 
 All copy, the display name, birthday letter, wishes, finale, and music filename are centralized in `src/features/celebration/data/birthday.ts`. Cake choices and their typed contracts live in `src/features/cakes/`. Update those data modules rather than the scene components. Copy `.env.example` to `.env.local` to set the birthday name and `MM-DD` birthday date. The browser-local countdown is enabled by default and is a strict gate: the surprise becomes available only at midnight in the visitor's local time on the birthday. For a developer preview, set `NEXT_PUBLIC_COUNTDOWN_NOT_ENABLED=true`; otherwise leave it unset or `false`. These `NEXT_PUBLIC_*` variables are embedded at build time, so rebuild after changing them.
 
-Put JPEG, PNG, or WebP photos in `public/assets/` (or move them into `public/assets/photos/`) and update the `photoPaths` list in that same config. The current supplied photos are already wired in, encoded safely for filenames with spaces, and displayed with `object-fit: contain` in the featured viewer.
+Put JPEG, PNG, or WebP photos in `public/assets/photos/` and update the `photoPaths` list in that same config. Portrait assets belong in `public/assets/avatars/`, and optional music belongs in `public/assets/music/`. The current supplied photos are already wired in, encoded safely for filenames with spaces, and displayed with `object-fit: contain` in the featured viewer.
 
 Optional music goes in `public/assets/music/`; the default configured filename is `birthday.mp3`. The player is only started after a visitor interaction. A missing file simply leaves the player paused.
 
