@@ -106,9 +106,15 @@ function cakeLevels(tiers: CakeTiers) {
   return heights.map((height, index) => { const level = { r: radii[index], height, y: previousHeight + height / 2 }; previousHeight += height; return level; });
 }
 
-function ServedCakeSlice({ tiers, frosting, filling }: { tiers: CakeTiers; frosting: string; filling: string }) {
-  const sliceHeight = .42 + tiers * .08;
-  return <group position={[1.28, sliceHeight / 2 + .18, .68]} rotation={[0, -.48, 0]}><mesh castShadow><boxGeometry args={[.66, sliceHeight, .66]} /><meshStandardMaterial color={frosting} roughness={.42} /></mesh><mesh position={[0, -.03, .336]}><boxGeometry args={[.67, .075, .018]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh><mesh position={[0, sliceHeight / 2 + .012, 0]}><boxGeometry args={[.58, .03, .58]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh></group>;
+function CakeChatBubble({ position, heading, message, icon, compact = false }: { position: [number, number, number]; heading: string; message?: string; icon: string; compact?: boolean }) {
+  return <Html position={position} center distanceFactor={compact ? 6.7 : 8.75} style={{ pointerEvents: "none" }}><div className={`cake-tooltip${compact ? " cake-tooltip--compact" : ""}`} role="status"><span className="cake-tooltip-tail" /><span className="cake-tooltip-avatar">{icon}</span><div><strong>{heading}</strong>{message && <span>{message}</span>}</div></div></Html>;
+}
+
+function ServedCakeSlice({ frosting, filling }: { frosting: string; filling: string }) {
+  const [hovered, setHovered] = useState(false);
+  const sliceHeight = .68, sliceRadius = .72, sliceStart = -.55, sliceArc = 1.1;
+  useCursor(hovered, "pointer", "grab");
+  return <group position={[1.05, sliceHeight / 2 + .18, .64]} rotation={[0, -.2, 0]} onPointerOver={(event) => { event.stopPropagation(); setHovered(true); }} onPointerOut={() => setHovered(false)}><mesh castShadow><cylinderGeometry args={[sliceRadius, sliceRadius * 1.08, sliceHeight, 32, 1, false, sliceStart, sliceArc]} /><meshStandardMaterial color={frosting} roughness={.42} /></mesh><mesh position={[0, sliceHeight / 2 + .012, 0]}><cylinderGeometry args={[sliceRadius * .92, sliceRadius * .92, .035, 32, 1, false, sliceStart, sliceArc]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh>{hovered && <CakeChatBubble position={[.62, .58, .2]} heading="A slice for our birthday friend" icon="🍰" compact />}</group>;
 }
 
 function Cake({ lit, cut, flavor, shape, tiers, candles, showTooltip = false }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; showTooltip?: boolean }) {
@@ -123,9 +129,8 @@ function Cake({ lit, cut, flavor, shape, tiers, candles, showTooltip = false }: 
   return <group position={[0, -.84, 0]} onPointerOver={showTooltip ? (event) => { event.stopPropagation(); setHovered(true); } : undefined} onPointerOut={showTooltip ? () => setHovered(false) : undefined}>
     {levels.map((level, index) => <group key={`cake-tier-${index}`} position={[0, level.y, 0]}><CakeLayer shape={shape} size={level.r} height={level.height} frosting={style.frosting} filling={style.filling} /></group>)}
     {candlePositions.map(([x, y], index) => <group key={`candle-${index}`} position={[x, y + .02 * candleScale, 0]} scale={[candleScale, candleScale, candleScale]}><mesh position={[0, .17, 0]}><cylinderGeometry args={[.062, .062, .34, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .17, .063]}><boxGeometry args={[.016, .3, .012]} /><meshBasicMaterial color="#fff4bf" /></mesh><mesh position={[0, .345, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.064, .011, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .4, 0]} color="#ff9d35" intensity={2.7} distance={2.4} /><CandleFlame index={index} tipY={.36} /></> : <><CandleSmoke index={index} puff={0} tipY={.4} /><CandleSmoke index={index} puff={1} tipY={.4} /></>}</group>)}
-    {cut && <ServedCakeSlice tiers={tiers} frosting={style.frosting} filling={style.filling} />}
-    {cut && <Text position={[0, topY + .68, .32]} fontSize={.12} color="#ffe7a4" anchorX="center" letterSpacing={.06}>A SLICE FOR OUR BIRTHDAY FRIEND</Text>}
-    {showTooltip && hovered && <Html position={[1.85, topY + .32, -.35]} center distanceFactor={8.75} style={{ pointerEvents: "none" }}><div className="cake-tooltip" role="status"><span className="cake-tooltip-tail" /><span className="cake-tooltip-avatar">🍰</span><div><strong>{style.name}</strong><span>{style.description}</span></div></div></Html>}
+    {cut && <ServedCakeSlice frosting={style.frosting} filling={style.filling} />}
+    {showTooltip && hovered && <CakeChatBubble position={[1.85, topY + .32, -.35]} heading={style.name} message={style.description} icon="🍰" />}
   </group>;
 }
 
