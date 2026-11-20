@@ -86,3 +86,11 @@ button{touch-action:manipulation}
   .dashboard-actions button{min-height:44px}
   .dashboard .giftbar{display:none}
 }
+
+/* Cake picker */
+.dashboard-actions{grid-template-columns:repeat(7,1fr)}
+.cake-picker-trigger{background:linear-gradient(135deg,#fff2b72b,#ffac6245)!important;border-color:#ffd78770!important}
+.cake-modal-copy{margin:.15rem 0 1.15rem;color:#eadce4;line-height:1.5}
+.cake-choices{display:grid;gap:.6rem}.cake-choices button{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:.75rem;width:100%;padding:.7rem;border:1px solid #ffffff24;border-radius:.85rem;background:#ffffff0a;text-align:left;transition:transform .2s,background .2s,border-color .2s}.cake-choices button:hover{transform:translateY(-2px);background:#ffffff14}.cake-choices button.selected{border-color:#ffe08d;background:#f5ca6b1c;box-shadow:0 0 20px #f6c46827}.cake-swatch{width:42px;height:42px;border-radius:50%;border:2px solid #fff7d299;box-shadow:inset 0 -6px 10px #0003}.cake-choices strong,.cake-choices small{display:block}.cake-choices strong{font-size:.95rem}.cake-choices small{margin-top:.18rem;color:#e4d6df;font:500 .74rem Arial,sans-serif;line-height:1.3}.cake-selected{color:#ffe199;font:700 .62rem Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+@media(max-width:850px){.dashboard-actions{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){.dashboard-actions{grid-template-columns:repeat(3,1fr)}.cake-choices button{grid-template-columns:37px 1fr;padding:.6rem}.cake-swatch{width:37px;height:37px}.cake-selected{grid-column:2;font-size:.57rem}}
