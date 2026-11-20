@@ -258,7 +258,7 @@ function SideSparkleCrackers({ active, pulse }: { active: boolean; pulse: number
 function CakeCutCamera({ active }: { active: boolean }) {
   const { camera } = useThree();
   const startedAt = useRef<number | null>(null), start = useRef(new THREE.Vector3());
-  const target = useRef(new THREE.Vector3(0, .9, 7.9));
+  const target = useRef(new THREE.Vector3(0, .55, 9.4));
   useEffect(() => { if (!active) startedAt.current = null; }, [active]);
   useFrame(({ clock }) => {
     if (!active || startedAt.current === -1) return;
