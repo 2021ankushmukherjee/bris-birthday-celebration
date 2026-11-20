@@ -1,4 +1,19 @@
 export type CakeFlavor = "mango" | "chocolate" | "butterscotch" | "vanilla" | "black-forest" | "red-velvet";
+export type CakeShape = "round" | "heart" | "square" | "rectangular";
+export type CakeTiers = 1 | 2 | 3;
+
+export const cakeShapes: { id: CakeShape; name: string; icon: string; description: string }[] = [
+  { id: "round", name: "Round", icon: "●", description: "A timeless celebration classic" },
+  { id: "heart", name: "Heart", icon: "♥", description: "Made with extra love" },
+  { id: "square", name: "Square", icon: "■", description: "Neat and modern" },
+  { id: "rectangular", name: "Rectangular", icon: "▬", description: "Perfect for sharing" },
+];
+
+export const cakeTierChoices: { id: CakeTiers; name: string; description: string }[] = [
+  { id: 1, name: "One stage", description: "Single-stage cake" },
+  { id: 2, name: "Two stages", description: "A little more grand" },
+  { id: 3, name: "Three stages", description: "The full celebration" },
+];
 
 export const cakeChoices: { id: CakeFlavor; name: string; description: string; icon: string; swatch: string; frosting: string; filling: string }[] = [
   { id: "mango", name: "Mango Cake", description: "Sunny mango frosting with fresh fruit.", icon: "🥭", swatch: "linear-gradient(135deg, #ffc94f, #ff8e32)", frosting: "#ffc34f", filling: "#ff8a2d" },
