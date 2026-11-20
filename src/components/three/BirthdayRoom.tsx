@@ -102,6 +102,42 @@ function PartyBurst({ active, pulse }: { active: boolean; pulse: number }) {
   return <group key={`party-burst-${pulse}`} position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={`confetti-${pulse}-${index}`} index={index} />)}</group>;
 }
 
+function SparkleFountain({ position, direction, active, pulse }: { position: [number, number, number]; direction: number; active: boolean; pulse: number }) {
+  const stream = Array.from({ length: 28 }, (_, index) => {
+    const spread = ((index % 9) - 4) * .105 + direction * .1;
+    return { angle: spread, lift: 3.05 + (index % 6) * .16, speed: .8 + (index % 5) * .12, color: ["#fffbe0", "#ffd36b", "#ff9ab8", "#d7c8ff"][index % 4] };
+  });
+  return <group position={position} rotation={[0, direction > 0 ? -.25 : .25, direction * -.11]}>
+    <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.13, .17, .5, 20]} /><meshStandardMaterial color="#b83e68" metalness={.5} roughness={.25} emissive={active ? "#7b163d" : "#220817"} emissiveIntensity={active ? 1.3 : .2} /></mesh>
+    <mesh position={[0, .28, 0]}><cylinderGeometry args={[.018, .018, .16, 8]} /><meshStandardMaterial color="#d7a95d" emissive={active ? "#ffb64d" : "#000000"} emissiveIntensity={active ? 2 : 0} /></mesh>
+    {active && <><pointLight position={[0, 1.35, .1]} color="#ffbd62" intensity={7} distance={4.2} decay={2} /><pointLight position={[0, 2.7, .15]} color="#ffdca0" intensity={3.2} distance={3.2} decay={2} /></>}
+    {active && <group key={`sparkle-fountain-${pulse}`}>{stream.map((spark, index) => <FountainSpark key={index} {...spark} index={index} />)}</group>}
+  </group>;
+}
+
+function FountainSpark({ index, angle, lift, speed, color }: { index: number; angle: number; lift: number; speed: number; color: string }) {
+  const spark = useRef<THREE.Mesh>(null), material = useRef<THREE.MeshBasicMaterial>(null), startedAt = useRef<number | null>(null);
+  useFrame(({ clock }) => {
+    if (!spark.current || !material.current) return;
+    if (startedAt.current === null) startedAt.current = clock.elapsedTime;
+    const time = (clock.elapsedTime - startedAt.current + (index % 7) * .09) % 1.7;
+    const progress = time / 1.7;
+    const distance = speed * time;
+    spark.current.position.set(Math.sin(angle) * distance, .28 + lift * time - 1.1 * time * time, Math.cos(angle) * distance * .32);
+    spark.current.scale.set(.45 + (1 - progress) * .75, 1.1 + (1 - progress) * 2.2, .45 + (1 - progress) * .75);
+    spark.current.rotation.z = angle;
+    material.current.opacity = Math.sin(progress * Math.PI) * .95;
+  });
+  return <mesh ref={spark}><sphereGeometry args={[.032, 10, 10]} /><meshBasicMaterial ref={material} color={color} transparent depthWrite={false} toneMapped={false} /></mesh>;
+}
+
+function SideSparkleCrackers({ active, pulse }: { active: boolean; pulse: number }) {
+  return <group>
+    <SparkleFountain position={[-3.72, -1.23, -1.22]} direction={1} active={active} pulse={pulse} />
+    <SparkleFountain position={[3.72, -1.23, -1.22]} direction={-1} active={active} pulse={pulse} />
+  </group>;
+}
+
 function CakeCutCamera({ active }: { active: boolean }) {
   const { camera } = useThree();
   const startedAt = useRef<number | null>(null), start = useRef(new THREE.Vector3());
@@ -126,13 +162,13 @@ function ResponsiveRoomDecor({ lit }: { lit: boolean }) {
   return <><DiwaliLights on={lit} diyaScale={scale} /><Float speed={1.4} floatIntensity={.45}><Balloon position={roundPositions[0]} color="#f4aac2" scale={scale} /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={roundPositions[1]} color="#c8b1f4" scale={scale} /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={roundPositions[2]} color="#ffd18c" scale={scale} /></Float><HeartBalloon position={heartPositions[0]} color="#ee6f94" scale={scale} /><HeartBalloon position={heartPositions[1]} color="#f56e87" scale={scale} /></>;
 }
 
-export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, cakeFlavor = "mango", popperBurst, popperPulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; cakeFlavor?: CakeFlavor; popperBurst: boolean; popperPulse: number }) {
+export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, cakeFlavor = "mango", popperBurst, popperPulse, sparkleBurst, sparklePulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; cakeFlavor?: CakeFlavor; popperBurst: boolean; popperPulse: number; sparkleBurst: boolean; sparklePulse: number }) {
   return <Canvas shadows camera={{ position: [4.8, 1.65, 4.8], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={[roomLit ? "#100d2a" : "#070617"]} /><fog attach="fog" args={[roomLit ? "#100d2a" : "#070617", 7, 16]} />
     <ambientLight intensity={roomLit ? .75 : .12} /><pointLight position={[0, 4, 2]} intensity={roomLit ? 55 : 3} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={roomLit ? 13 : 1} color="#bfa9ff" distance={6} /><pointLight position={[3, 2, -1]} intensity={roomLit ? 10 : 0} color="#f2a3c0" distance={5} />
     <mesh position={[0, -1.55, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 14]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
     <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[12, 7]} /><meshStandardMaterial color="#241d3e" /></mesh>
-    <CakeCutCamera active={cakeCut} /><ResponsiveCakeScene lit={candlesLit} cut={cakeCut} flavor={cakeFlavor} /><ResponsiveRoomDecor lit={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
+    <CakeCutCamera active={cakeCut} /><ResponsiveCakeScene lit={candlesLit} cut={cakeCut} flavor={cakeFlavor} /><ResponsiveRoomDecor lit={roomLit} /><WallCelebration name={name} lit={roomLit} /><SideSparkleCrackers active={sparkleBurst} pulse={sparklePulse} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
     <OrbitControls target={[0, 0, 0]} enablePan={false} minDistance={4.3} maxDistance={8} maxPolarAngle={Math.PI / 2.05} />
   </Canvas>;
 }
