@@ -129,16 +129,18 @@ button{touch-action:manipulation}
 .cake-studio-body{flex:1 1 0;overflow:hidden}
 .cake-preview-panel{min-height:0}
 .cake-studio-controls{height:100%;overscroll-behavior:contain;scroll-behavior:smooth;scrollbar-gutter:stable}
-.cake-studio-controls .cake-done{min-height:46px;margin-bottom:0;padding:.62rem .85rem;border-radius:.75rem;font-size:.9rem;line-height:1.15;background:linear-gradient(135deg,#f5b854,#df668b);box-shadow:0 -10px 24px #17132fe6,0 8px 22px #e77a7252}
-.cake-studio-controls .cake-done:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 -10px 24px #17132fe6,0 10px 25px #e77a7270}
-.cake-studio-controls .cake-done:focus-visible{outline:3px solid #fff1b5;outline-offset:3px}
+.cake-studio-footer{flex:0 0 auto;padding:.65rem .1rem 0;background:linear-gradient(180deg,transparent,#17132f 34%)}
+.cake-studio-footer .cake-done{min-height:46px;margin:0;padding:.62rem .85rem;border-radius:.75rem;font-size:.9rem;line-height:1.15;background:linear-gradient(135deg,#f5b854,#df668b);box-shadow:0 8px 22px #e77a7252}
+.cake-studio-footer .cake-done:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 10px 25px #e77a7270}
+.cake-studio-footer .cake-done:focus-visible{outline:3px solid #fff1b5;outline-offset:3px}
 
 @media(max-width:760px){
   .cake-modal{height:calc(100svh - 1rem)}
   .cake-studio-body{display:flex;flex-direction:column;min-height:0;overflow:hidden}
   .cake-preview-panel{flex:0 0 auto}
   .cake-studio-controls{flex:1 1 0;min-height:0;overflow:auto;padding:.15rem .2rem .2rem 0}
-  .cake-studio-controls .cake-done{position:sticky;bottom:0;margin-top:.6rem;padding:.65rem .75rem}
+  .cake-studio-footer{padding-top:.5rem}
+  .cake-studio-footer .cake-done{padding:.65rem .75rem}
 }
 
 /* A more cinematic welcome for the birthday invitation. */
