@@ -149,6 +149,7 @@ button{touch-action:manipulation}
 }
 
 /* Keep the full party-wear portrait in view: it has its own inset frame within the 3D stage. */
+.party-wear-preview{justify-content:flex-start}.party-wear-preview .preview-badge{margin:.2rem 0 .6rem}.party-wear-preview .party-wear-visual{margin-top:.15rem}
 .party-wear-avatar-preview{right:3.5%;bottom:2%;display:flex;width:40%;height:94%;align-items:flex-end;justify-content:center}.party-wear-avatar-preview img{width:100%;height:100%;object-fit:contain}.party-wear-visual{padding-right:0}
 @media(max-width:760px){.party-wear-avatar-preview{right:2.5%;bottom:2%;width:39%;height:93%}}
 
