@@ -144,8 +144,12 @@ function ResponsiveCakeScene({ lit, cut, flavor, shape, tiers, candles, petals }
   </group>;
 }
 
-function CakePreviewScene({ flavor, shape, tiers, candles, petals }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount }) {
-  return <><ambientLight intensity={1.15} /><hemisphereLight args={["#ffe5c0", "#291737", 1.6]} /><spotLight position={[3.6, 5, 4]} angle={.46} penumbra={.8} intensity={60} color="#ffe0ac" castShadow /><pointLight position={[-3, 1.5, 2]} intensity={16} color="#ed8bb3" distance={5} /><group scale={[.9, .9, .9]}><CelebrationTable /><Cake lit cut={false} flavor={flavor} shape={shape} tiers={tiers} candles={candles} /><RosePetals count={petals} /></group></>;
+function CakePreviewScene({ flavor, shape, tiers, candles, petals, roomLit }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount; roomLit: boolean }) {
+  return <><ambientLight intensity={roomLit ? 1.15 : .38} /><hemisphereLight args={["#ffe5c0", "#291737", roomLit ? 1.6 : .48]} /><spotLight position={[3.6, 5, 4]} angle={.46} penumbra={.8} intensity={roomLit ? 60 : 5} color="#ffe0ac" castShadow /><pointLight position={[-3, 1.5, 2]} intensity={roomLit ? 16 : 1.1} color="#ed8bb3" distance={5} /><PreviewRoomBackdrop roomLit={roomLit} /><group scale={[.9, .9, .9]}><CelebrationTable /><Cake lit={roomLit} cut={false} flavor={flavor} shape={shape} tiers={tiers} candles={candles} /><RosePetals count={petals} /></group></>;
+}
+
+function PreviewRoomBackdrop({ roomLit }: { roomLit: boolean }) {
+  return <group><mesh position={[0, -2.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[11, 9]} /><meshStandardMaterial color="#201735" roughness={.84} /></mesh><mesh position={[0, .8, -2.5]} receiveShadow><planeGeometry args={[10, 6]} /><meshStandardMaterial color="#32234c" roughness={.9} /></mesh><mesh position={[-3.3, 1.2, -2.35]}><sphereGeometry args={[.32, 20, 16]} /><meshStandardMaterial color="#ef92b4" emissive="#cc577f" emissiveIntensity={roomLit ? .45 : .03} /></mesh><mesh position={[3.1, 1.55, -2.35]}><sphereGeometry args={[.28, 20, 16]} /><meshStandardMaterial color="#f4c771" emissive="#d89547" emissiveIntensity={roomLit ? .4 : .03} /></mesh>{roomLit && <><pointLight position={[-3.3, 1.2, -1.8]} color="#f28eae" intensity={2.2} distance={3.2} /><pointLight position={[3.1, 1.55, -1.8]} color="#f8d17f" intensity={2} distance={3.2} /></>}</group>;
 }
 
 function CakePreviewControls({ zoom }: { zoom: number }) {
@@ -162,8 +166,8 @@ function CakePreviewControls({ zoom }: { zoom: number }) {
   return <OrbitControls ref={controls} target={[0, -.25, 0]} enablePan={false} enableZoom={false} enableDamping dampingFactor={.08} minDistance={4.9} maxDistance={8.3} minPolarAngle={Math.PI / 3.2} maxPolarAngle={Math.PI / 1.7} />;
 }
 
-export function CakePreview3D({ flavor, shape, tiers, candles, petals, zoom = 0 }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount; zoom?: number }) {
-  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} candles={candles} petals={petals} /><CakePreviewControls zoom={zoom} /></Canvas>;
+export function CakePreview3D({ flavor, shape, tiers, candles, petals, zoom = 0, roomLit = true }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount; zoom?: number; roomLit?: boolean }) {
+  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} candles={candles} petals={petals} roomLit={roomLit} /><CakePreviewControls zoom={zoom} /></Canvas>;
 }
 
 function Diya({ position, on, scale = 1 }: { position: [number, number, number]; on: boolean; scale?: number }) {
