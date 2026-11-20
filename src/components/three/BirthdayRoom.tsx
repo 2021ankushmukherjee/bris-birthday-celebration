@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, OrbitControls, Sparkles, Text } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { cakeChoices, type CakeFlavor, type CakeShape, type CakeTiers } from "@/config/cakes";
+import { cakeChoices, type CakeCandles, type CakeFlavor, type CakeShape, type CakeTiers, type PetalCount } from "@/config/cakes";
 
 const outerFlameProfile = [new THREE.Vector2(0, 0), new THREE.Vector2(.075, .025), new THREE.Vector2(.09, .105), new THREE.Vector2(.055, .2), new THREE.Vector2(0, .3)];
 const innerFlameProfile = [new THREE.Vector2(0, .01), new THREE.Vector2(.04, .035), new THREE.Vector2(.048, .1), new THREE.Vector2(.025, .17), new THREE.Vector2(0, .22)];
@@ -43,15 +43,15 @@ function BannerClock() {
   </group>;
 }
 
-function CandleFlame({ index }: { index: number }) {
+function CandleFlame({ index, tipY = .36 }: { index: number; tipY?: number }) {
   const flame = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (!flame.current) return; const sway = Math.sin(clock.elapsedTime * 7 + index * 1.8) * .11; flame.current.rotation.z = sway; flame.current.rotation.x = Math.cos(clock.elapsedTime * 5 + index) * .035; flame.current.scale.y = 1 + Math.sin(clock.elapsedTime * 9 + index) * .08; });
-  return <group ref={flame} position={[0, .19, 0]}><mesh><latheGeometry args={[outerFlameProfile, 20]} /><meshStandardMaterial color="#ff8a24" emissive="#ff5a12" emissiveIntensity={2.6} roughness={.18} /></mesh><mesh position={[0, .005, .008]}><latheGeometry args={[innerFlameProfile, 20]} /><meshBasicMaterial color="#fff2a5" /></mesh></group>;
+  return <group ref={flame} position={[0, tipY, 0]}><mesh><latheGeometry args={[outerFlameProfile, 20]} /><meshStandardMaterial color="#ff8a24" emissive="#ff5a12" emissiveIntensity={2.6} roughness={.18} /></mesh><mesh position={[0, .005, .008]}><latheGeometry args={[innerFlameProfile, 20]} /><meshBasicMaterial color="#fff2a5" /></mesh></group>;
 }
 
-function CandleSmoke({ index, puff }: { index: number; puff: number }) {
+function CandleSmoke({ index, puff, tipY = .39 }: { index: number; puff: number; tipY?: number }) {
   const smoke = useRef<THREE.Mesh>(null), material = useRef<THREE.MeshBasicMaterial>(null), startedAt = useRef<number | null>(null);
-  useFrame(({ clock }) => { if (!smoke.current || !material.current) return; if (startedAt.current === null) startedAt.current = clock.elapsedTime; const age = clock.elapsedTime - startedAt.current; const progress = Math.min(age / 3.2, 1); smoke.current.position.set(Math.sin(age * 1.8 + index + puff) * (.025 + progress * .055) + (puff - .5) * .035, .16 + progress * (.38 + puff * .12), Math.cos(age * 1.4 + index) * .025); smoke.current.scale.setScalar(.35 + progress * 1.25); material.current.opacity = (1 - progress) * .28; });
+  useFrame(({ clock }) => { if (!smoke.current || !material.current) return; if (startedAt.current === null) startedAt.current = clock.elapsedTime; const age = clock.elapsedTime - startedAt.current; const progress = Math.min(age / 3.2, 1); smoke.current.position.set(Math.sin(age * 1.8 + index + puff) * (.025 + progress * .055) + (puff - .5) * .035, tipY + progress * (.38 + puff * .12), Math.cos(age * 1.4 + index) * .025); smoke.current.scale.setScalar(.35 + progress * 1.25); material.current.opacity = (1 - progress) * .28; });
   return <mesh ref={smoke}><sphereGeometry args={[.06, 14, 14]} /><meshBasicMaterial ref={material} color="#d7d3dc" transparent depthWrite={false} opacity={.28} /></mesh>;
 }
 
@@ -77,8 +77,8 @@ function HeartBalloon({ position, color, scale = 1 }: { position: [number, numbe
   return <group ref={ref} position={position} onClick={(event) => { event.stopPropagation(); pop(); }}><group ref={visual}><mesh scale={[.62, .62, .62]}><shapeGeometry args={[heartShape]} /><meshStandardMaterial color={color} emissive={color} emissiveIntensity={.12} roughness={.28} metalness={.12} side={THREE.DoubleSide} /></mesh><mesh position={[0, -.56, 0]}><cylinderGeometry args={[.008, .008, .5, 8]} /><meshStandardMaterial color="#d7b16b" /></mesh></group>{burstActive && <BalloonConfetti key={`heart-burst-${burstId}`} />}</group>;
 }
 
-function RosePetals() {
-  const petals = Array.from({ length: 52 }, (_, index) => { const angle = index * 2.42; const radius = .92 + (index % 6) * .15; return { x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, rotation: angle * 1.7, color: index % 5 < 3 ? "#c93456" : index % 5 === 3 ? "#e95775" : "#f6a0b4" }; });
+function RosePetals({ count }: { count: PetalCount }) {
+  const petals = Array.from({ length: count }, (_, index) => { const angle = index * 2.42; const radius = .92 + (index % 6) * .15; return { x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, rotation: angle * 1.7, color: index % 5 < 3 ? "#c93456" : index % 5 === 3 ? "#e95775" : "#f6a0b4" }; });
   return <group position={[0, -.64, .04]}>{petals.map((petal, index) => <mesh key={`petal-${index}`} position={[petal.x, .012, petal.z]} rotation={[-Math.PI / 2, 0, petal.rotation]} scale={[1, .65, 1]}><circleGeometry args={[.078, 14]} /><meshStandardMaterial color={petal.color} emissive={petal.color} emissiveIntensity={.15} roughness={.45} side={THREE.DoubleSide} /></mesh>)}</group>;
 }
 
@@ -109,36 +109,37 @@ function ServedCakeSlice({ tiers, frosting, filling }: { tiers: CakeTiers; frost
   return <group position={[1.28, sliceHeight / 2 + .18, .68]} rotation={[0, -.48, 0]}><mesh castShadow><boxGeometry args={[.66, sliceHeight, .66]} /><meshStandardMaterial color={frosting} roughness={.42} /></mesh><mesh position={[0, -.03, .336]}><boxGeometry args={[.67, .075, .018]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh><mesh position={[0, sliceHeight / 2 + .012, 0]}><boxGeometry args={[.58, .03, .58]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh></group>;
 }
 
-function Cake({ lit, cut, flavor, shape, tiers }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers }) {
+function Cake({ lit, cut, flavor, shape, tiers, candles }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles }) {
   const style = cakeChoices.find((cake) => cake.id === flavor)!;
   const levels = cakeLevels(tiers);
   const topY = levels[levels.length - 1].y + levels[levels.length - 1].height / 2;
-  const candlePositions = shape === "heart" ? [[0, topY]] : [[-.36, topY], [0, topY], [.36, topY]];
+  const candlePositions = shape === "heart" || candles === 1 ? [[0, topY]] : candles === 2 ? [[-.18, topY], [.18, topY]] : [[-.36, topY], [0, topY], [.36, topY]];
+  const candleScale = (1 + tiers * .15) * (shape === "heart" ? 1.15 : 1);
   // Sink the bevel very slightly into the platter so every shape reads as resting on it.
   return <group position={[0, -.84, 0]}>
     {levels.map((level, index) => <group key={`cake-tier-${index}`} position={[0, level.y, 0]}><CakeLayer shape={shape} size={level.r} height={level.height} frosting={style.frosting} filling={style.filling} /></group>)}
-    {candlePositions.map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]} scale={[1.32, 1.32, 1.32]}><mesh><cylinderGeometry args={[.047, .047, .23, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .118, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.049, .009, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .22, 0]} color="#ff9d35" intensity={2.7} distance={2.4} /><CandleFlame index={index} /></> : <><CandleSmoke index={index} puff={0} /><CandleSmoke index={index} puff={1} /></>}</group>)}
+    {candlePositions.map(([x, y], index) => <group key={`candle-${index}`} position={[x, y + .02 * candleScale, 0]} scale={[candleScale, candleScale, candleScale]}><mesh position={[0, .17, 0]}><cylinderGeometry args={[.062, .062, .34, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .17, .063]}><boxGeometry args={[.016, .3, .012]} /><meshBasicMaterial color="#fff4bf" /></mesh><mesh position={[0, .345, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.064, .011, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .4, 0]} color="#ff9d35" intensity={2.7} distance={2.4} /><CandleFlame index={index} tipY={.36} /></> : <><CandleSmoke index={index} puff={0} tipY={.4} /><CandleSmoke index={index} puff={1} tipY={.4} /></>}</group>)}
     {cut && <ServedCakeSlice tiers={tiers} frosting={style.frosting} filling={style.filling} />}
     {cut && <Text position={[0, topY + .68, .32]} fontSize={.12} color="#ffe7a4" anchorX="center" letterSpacing={.06}>A SLICE FOR THE BIRTHDAY GIRL</Text>}
   </group>;
 }
 
-function ResponsiveCakeScene({ lit, cut, flavor, shape, tiers }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers }) {
+function ResponsiveCakeScene({ lit, cut, flavor, shape, tiers, candles, petals }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount }) {
   const { size } = useThree();
   const scale = size.width <= 480 ? .68 : size.width <= 850 ? .84 : 1;
   return <group scale={[scale, size.width <= 480 ? .8 : .9, scale]}>
     <CelebrationTable />
-    <Cake lit={lit} cut={cut} flavor={flavor} shape={shape} tiers={tiers} />
-    <RosePetals />
+    <Cake lit={lit} cut={cut} flavor={flavor} shape={shape} tiers={tiers} candles={candles} />
+    <RosePetals count={petals} />
   </group>;
 }
 
-function CakePreviewScene({ flavor, shape, tiers }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers }) {
-  return <><ambientLight intensity={1.15} /><hemisphereLight args={["#ffe5c0", "#291737", 1.6]} /><spotLight position={[3.6, 5, 4]} angle={.46} penumbra={.8} intensity={60} color="#ffe0ac" castShadow /><pointLight position={[-3, 1.5, 2]} intensity={16} color="#ed8bb3" distance={5} /><group scale={[.9, .9, .9]}><CelebrationTable /><Cake lit cut={false} flavor={flavor} shape={shape} tiers={tiers} /><RosePetals /></group></>;
+function CakePreviewScene({ flavor, shape, tiers, candles, petals }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount }) {
+  return <><ambientLight intensity={1.15} /><hemisphereLight args={["#ffe5c0", "#291737", 1.6]} /><spotLight position={[3.6, 5, 4]} angle={.46} penumbra={.8} intensity={60} color="#ffe0ac" castShadow /><pointLight position={[-3, 1.5, 2]} intensity={16} color="#ed8bb3" distance={5} /><group scale={[.9, .9, .9]}><CelebrationTable /><Cake lit cut={false} flavor={flavor} shape={shape} tiers={tiers} candles={candles} /><RosePetals count={petals} /></group></>;
 }
 
-export function CakePreview3D({ flavor, shape, tiers }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers }) {
-  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} /><OrbitControls target={[0, -.25, 0]} enablePan={false} enableZoom={false} enableDamping dampingFactor={.08} minPolarAngle={Math.PI / 3.2} maxPolarAngle={Math.PI / 1.7} /></Canvas>;
+export function CakePreview3D({ flavor, shape, tiers, candles, petals }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount }) {
+  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} candles={candles} petals={petals} /><OrbitControls target={[0, -.25, 0]} enablePan={false} enableZoom={false} enableDamping dampingFactor={.08} minPolarAngle={Math.PI / 3.2} maxPolarAngle={Math.PI / 1.7} /></Canvas>;
 }
 
 function Diya({ position, on, scale = 1 }: { position: [number, number, number]; on: boolean; scale?: number }) {
@@ -235,13 +236,13 @@ function ResponsiveRoomDecor({ lit }: { lit: boolean }) {
   return <><DiwaliLights on={lit} diyaScale={scale} /><Float speed={1.4} floatIntensity={.45}><Balloon position={roundPositions[0]} color="#f4aac2" scale={scale} /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={roundPositions[1]} color="#c8b1f4" scale={scale} /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={roundPositions[2]} color="#ffd18c" scale={scale} /></Float><HeartBalloon position={heartPositions[0]} color="#ee6f94" scale={scale} /><HeartBalloon position={heartPositions[1]} color="#f56e87" scale={scale} /></>;
 }
 
-export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, cakeFlavor = "mango", cakeShape = "round", cakeTiers = 3, popperBurst, popperPulse, sparkleBurst, sparklePulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; cakeFlavor?: CakeFlavor; cakeShape?: CakeShape; cakeTiers?: CakeTiers; popperBurst: boolean; popperPulse: number; sparkleBurst: boolean; sparklePulse: number }) {
+export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, cakeFlavor = "mango", cakeShape = "round", cakeTiers = 3, cakeCandles = 3, petalCount = 72, popperBurst, popperPulse, sparkleBurst, sparklePulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; cakeFlavor?: CakeFlavor; cakeShape?: CakeShape; cakeTiers?: CakeTiers; cakeCandles?: CakeCandles; petalCount?: PetalCount; popperBurst: boolean; popperPulse: number; sparkleBurst: boolean; sparklePulse: number }) {
   return <Canvas shadows camera={{ position: [6.8, 2, 6.8], fov: 46 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={[roomLit ? "#100d2a" : "#070617"]} /><fog attach="fog" args={[roomLit ? "#100d2a" : "#070617", 7, 16]} />
     <ambientLight intensity={roomLit ? .75 : .12} /><pointLight position={[0, 4, 2]} intensity={roomLit ? 55 : 3} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={roomLit ? 13 : 1} color="#bfa9ff" distance={6} /><pointLight position={[3, 2, -1]} intensity={roomLit ? 10 : 0} color="#f2a3c0" distance={5} />
     <mesh position={[0, -2.08, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[18, 18]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
     <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[15, 8]} /><meshStandardMaterial color="#241d3e" /></mesh>
-    <CakeCutCamera active={cakeCut} /><ResponsiveCakeScene key={`cake-${cakeFlavor}-${cakeShape}-${cakeTiers}`} lit={candlesLit} cut={cakeCut} flavor={cakeFlavor} shape={cakeShape} tiers={cakeTiers} /><ResponsiveRoomDecor lit={roomLit} /><WallCelebration name={name} lit={roomLit} /><SideSparkleCrackers active={sparkleBurst} pulse={sparklePulse} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
+    <CakeCutCamera active={cakeCut} /><ResponsiveCakeScene key={`cake-${cakeFlavor}-${cakeShape}-${cakeTiers}-${cakeCandles}-${petalCount}`} lit={candlesLit} cut={cakeCut} flavor={cakeFlavor} shape={cakeShape} tiers={cakeTiers} candles={cakeShape === "heart" ? 1 : cakeCandles} petals={petalCount} /><ResponsiveRoomDecor lit={roomLit} /><WallCelebration name={name} lit={roomLit} /><SideSparkleCrackers active={sparkleBurst} pulse={sparklePulse} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
     <OrbitControls target={[0, -.2, 0]} enablePan={false} minDistance={6.2} maxDistance={11} maxPolarAngle={Math.PI / 2.05} />
   </Canvas>;
 }
