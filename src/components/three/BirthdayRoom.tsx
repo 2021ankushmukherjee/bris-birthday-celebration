@@ -6,6 +6,15 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { cakeChoices, type CakeFlavor } from "@/config/cakes";
 
+const outerFlameProfile = [new THREE.Vector2(0, 0), new THREE.Vector2(.075, .025), new THREE.Vector2(.09, .105), new THREE.Vector2(.055, .2), new THREE.Vector2(0, .3)];
+const innerFlameProfile = [new THREE.Vector2(0, .01), new THREE.Vector2(.04, .035), new THREE.Vector2(.048, .1), new THREE.Vector2(.025, .17), new THREE.Vector2(0, .22)];
+
+function CandleFlame({ index }: { index: number }) {
+  const flame = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => { if (!flame.current) return; const sway = Math.sin(clock.elapsedTime * 7 + index * 1.8) * .11; flame.current.rotation.z = sway; flame.current.rotation.x = Math.cos(clock.elapsedTime * 5 + index) * .035; flame.current.scale.y = 1 + Math.sin(clock.elapsedTime * 9 + index) * .08; });
+  return <group ref={flame} position={[0, .19, 0]}><mesh><latheGeometry args={[outerFlameProfile, 20]} /><meshStandardMaterial color="#ff8a24" emissive="#ff5a12" emissiveIntensity={2.6} roughness={.18} /></mesh><mesh position={[0, .005, .008]}><latheGeometry args={[innerFlameProfile, 20]} /><meshBasicMaterial color="#fff2a5" /></mesh></group>;
+}
+
 function useBalloonPop() {
   const [popped, setPopped] = useState(false), [burstId, setBurstId] = useState(0), [burstActive, setBurstActive] = useState(false);
   const respawnTimer = useRef<number | null>(null), burstTimer = useRef<number | null>(null), reappearedAt = useRef(0);
@@ -37,7 +46,7 @@ function Cake({ lit, cut, flavor }: { lit: boolean; cut: boolean; flavor: CakeFl
   const style = cakeChoices.find((cake) => cake.id === flavor)!;
   return <group position={[0, -1.1, 0]}>
     {[{ r: 1.05, y: 0 }, { r: .77, y: .42 }, { r: .5, y: .78 }].map((x, index) => <group key={`cake-tier-${index}`} position={[0, x.y, 0]}><mesh castShadow><cylinderGeometry args={[x.r, x.r * 1.08, .42, 48]} /><meshStandardMaterial color={style.frosting} roughness={.48} /></mesh><mesh position={[0, .205, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[x.r * .92, .035, 10, 48]} /><meshStandardMaterial color={style.filling} roughness={.38} /></mesh></group>)}
-    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]}><mesh><cylinderGeometry args={[.035, .035, .2, 12]} /><meshStandardMaterial color="#ffd782" emissive="#8b4e20" /></mesh>{lit && <><pointLight position={[0, .2, 0]} color="#ff9d35" intensity={1.8} distance={1.8} /><mesh position={[0, .19, 0]} scale={[.75, 1.45, .75]}><sphereGeometry args={[.09, 16, 16]} /><meshStandardMaterial color="#ff9b38" emissive="#ff6a18" emissiveIntensity={2} roughness={.25} /></mesh><mesh position={[0, .19, .012]} scale={[.45, .95, .45]}><sphereGeometry args={[.075, 16, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh></>}</group>)}
+    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]}><mesh><cylinderGeometry args={[.047, .047, .23, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .118, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.049, .009, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit && <><pointLight position={[0, .22, 0]} color="#ff9d35" intensity={2.2} distance={2} /><CandleFlame index={index} /></>}</group>)}
     {cut && <><mesh position={[.52, .42, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.44, .42, .5]} /><meshStandardMaterial color={style.frosting} roughness={.48} /></mesh><mesh position={[.52, .64, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.45, .025, .51]} /><meshStandardMaterial color={style.filling} /></mesh></>}
     <Text position={[0, 1.72, .03]} fontSize={.13} color="#ffe7a4" anchorX="center">{cut ? "A SLICE FOR THE BIRTHDAY GIRL" : style.name.toUpperCase()}</Text>
   </group>;
