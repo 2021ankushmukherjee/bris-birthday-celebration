@@ -13,17 +13,17 @@ function useBalloonPop() {
   return { popped, burstId, burstActive, reappearedAt, pop };
 }
 
-function Balloon({ position, color }: { position: [number, number, number]; color: string }) {
+function Balloon({ position, color, scale = 1 }: { position: [number, number, number]; color: string; scale?: number }) {
   const ref = useRef<THREE.Group>(null), visual = useRef<THREE.Group>(null), { popped, burstId, burstActive, reappearedAt, pop } = useBalloonPop();
-  useFrame(({ clock }) => { if (!ref.current || !visual.current) return; ref.current.position.y = position[1] + Math.sin(clock.elapsedTime + position[0]) * .12; const appearedFor = reappearedAt.current ? (performance.now() - reappearedAt.current) / 1000 : 1; visual.current.scale.setScalar(popped ? .001 : Math.min(1, appearedFor / 1.15)); });
+  useFrame(({ clock }) => { if (!ref.current || !visual.current) return; ref.current.position.y = position[1] + Math.sin(clock.elapsedTime + position[0]) * .12; const appearedFor = reappearedAt.current ? (performance.now() - reappearedAt.current) / 1000 : 1; visual.current.scale.setScalar((popped ? .001 : Math.min(1, appearedFor / 1.15)) * scale); });
   return <group ref={ref} position={position} onClick={(event) => { event.stopPropagation(); pop(); }}><group ref={visual}><mesh><sphereGeometry args={[.34, 24, 24]} /><meshStandardMaterial color={color} roughness={.35} /></mesh><mesh position={[0, -.43, 0]}><cylinderGeometry args={[.008, .008, .42, 8]} /><meshStandardMaterial color="#d7b16b" /></mesh></group>{burstActive && <BalloonConfetti key={`round-burst-${burstId}`} />}</group>;
 }
 
 const heartShape = new THREE.Shape();
 heartShape.moveTo(0, -.28); heartShape.bezierCurveTo(-.55, .1, -.38, .5, 0, .22); heartShape.bezierCurveTo(.38, .5, .55, .1, 0, -.28);
-function HeartBalloon({ position, color }: { position: [number, number, number]; color: string }) {
+function HeartBalloon({ position, color, scale = 1 }: { position: [number, number, number]; color: string; scale?: number }) {
   const ref = useRef<THREE.Group>(null), visual = useRef<THREE.Group>(null), { popped, burstId, burstActive, reappearedAt, pop } = useBalloonPop();
-  useFrame(({ clock }) => { if (!ref.current || !visual.current) return; ref.current.position.y = position[1] + Math.sin(clock.elapsedTime * 1.2 + position[0]) * .1; ref.current.rotation.z = Math.sin(clock.elapsedTime + position[0]) * .05; const appearedFor = reappearedAt.current ? (performance.now() - reappearedAt.current) / 1000 : 1; visual.current.scale.setScalar(popped ? .001 : Math.min(1, appearedFor / 1.15)); });
+  useFrame(({ clock }) => { if (!ref.current || !visual.current) return; ref.current.position.y = position[1] + Math.sin(clock.elapsedTime * 1.2 + position[0]) * .1; ref.current.rotation.z = Math.sin(clock.elapsedTime + position[0]) * .05; const appearedFor = reappearedAt.current ? (performance.now() - reappearedAt.current) / 1000 : 1; visual.current.scale.setScalar((popped ? .001 : Math.min(1, appearedFor / 1.15)) * scale); });
   return <group ref={ref} position={position} onClick={(event) => { event.stopPropagation(); pop(); }}><group ref={visual}><mesh scale={[.62, .62, .62]}><shapeGeometry args={[heartShape]} /><meshStandardMaterial color={color} emissive={color} emissiveIntensity={.12} roughness={.28} metalness={.12} side={THREE.DoubleSide} /></mesh><mesh position={[0, -.56, 0]}><cylinderGeometry args={[.008, .008, .5, 8]} /><meshStandardMaterial color="#d7b16b" /></mesh></group>{burstActive && <BalloonConfetti key={`heart-burst-${burstId}`} />}</group>;
 }
 
@@ -40,15 +40,25 @@ function Cake({ lit, cut }: { lit: boolean; cut: boolean }) {
   </group>;
 }
 
+function ResponsiveCakeScene({ lit, cut }: { lit: boolean; cut: boolean }) {
+  const { size } = useThree();
+  const scale = size.width <= 480 ? .68 : size.width <= 850 ? .84 : 1;
+  return <group scale={[scale, size.width <= 480 ? .8 : .9, scale]}>
+    <mesh position={[0, -.75, .1]}><cylinderGeometry args={[1.45, 1.45, .14, 48]} /><meshStandardMaterial color="#d4a95f" metalness={.65} roughness={.25} /></mesh>
+    <Cake lit={lit} cut={cut} />
+    <RosePetals />
+  </group>;
+}
+
 function Diya({ position, on }: { position: [number, number, number]; on: boolean }) {
   return <group position={position}><mesh><cylinderGeometry args={[.15, .1, .07, 24]} /><meshStandardMaterial color="#c96a2a" metalness={.45} roughness={.3} /></mesh><mesh position={[0, .055, 0]}><sphereGeometry args={[.12, 20, 12]} /><meshStandardMaterial color="#f1a24c" emissive={on ? "#f08a28" : "#000000"} emissiveIntensity={on ? 2 : 0} /></mesh>{on && <><pointLight position={[0, .22, 0]} color="#ffb655" intensity={1.3} distance={2.3} /><mesh position={[0, .19, 0]} scale={[.55, 1.15, .55]}><sphereGeometry args={[.1, 14, 14]} /><meshBasicMaterial color="#fff1a5" /></mesh></>}</group>;
 }
 
-function DiwaliLights({ on }: { on: boolean }) {
+function DiwaliLights({ on, diyaScale = 1 }: { on: boolean; diyaScale?: number }) {
   const colors = ["#fff2ad", "#f6b8b7", "#d8c2ff", "#c8f0ec", "#ffe09a", "#f9c9d7"];
   const ceilingBulbs = [-4.15, -3.1, -2.05, -.95, .1, 1.15, 2.15, 3.15, 4.05];
   const lanterns = [-3.35, -2.85, 2.85, 3.35];
-  return <group><group position={[0, 3.18, -1.82]}>{ceilingBulbs.map((x, index) => <Float key={`ceiling-bulb-${index}`} speed={1.1 + index * .07} floatIntensity={.08}><group position={[x, index % 2 ? -.08 : .04, 0]}><mesh><sphereGeometry args={[.115, 16, 16]} /><meshStandardMaterial color={on ? colors[index % colors.length] : "#413956"} emissive={on ? colors[index % colors.length] : "#000000"} emissiveIntensity={on ? 2.8 : 0} /></mesh>{on && <pointLight color={colors[index % colors.length]} intensity={.65} distance={1.5} />}</group></Float>)}</group><group position={[0, 1.66, -2.18]}>{lanterns.map((x, index) => <Float key={`lantern-${index}`} speed={1.15 + index * .1} floatIntensity={.08}><group position={[x, index % 2 ? .12 : -.05, 0]}><mesh position={[0, .23, -.015]}><cylinderGeometry args={[.018, .018, .55, 8]} /><meshStandardMaterial color="#d7a24d" /></mesh><mesh><boxGeometry args={[.2, .3, .07]} /><meshStandardMaterial color={on ? "#c8494e" : "#332c45"} emissive={on ? "#7f202c" : "#000000"} emissiveIntensity={on ? 1.2 : 0} /></mesh><mesh position={[0, 0, .045]}><sphereGeometry args={[.052, 12, 12]} /><meshBasicMaterial color={on ? "#ffe4a4" : "#4a4159"} /></mesh>{on && <pointLight color="#ffba67" intensity={.85} distance={1.7} />}</group></Float>)}</group><Diya position={[-2.25, -1.4, -1.5]} on={on} /><Diya position={[-1.65, -1.4, -1.6]} on={on} /><Diya position={[1.65, -1.4, -1.6]} on={on} /><Diya position={[2.25, -1.4, -1.5]} on={on} /></group>;
+  return <group><group position={[0, 3.18, -1.82]}>{ceilingBulbs.map((x, index) => <Float key={`ceiling-bulb-${index}`} speed={1.1 + index * .07} floatIntensity={.08}><group position={[x, index % 2 ? -.08 : .04, 0]}><mesh><sphereGeometry args={[.115, 16, 16]} /><meshStandardMaterial color={on ? colors[index % colors.length] : "#413956"} emissive={on ? colors[index % colors.length] : "#000000"} emissiveIntensity={on ? 2.8 : 0} /></mesh>{on && <pointLight color={colors[index % colors.length]} intensity={.65} distance={1.5} />}</group></Float>)}</group><group position={[0, 1.66, -2.18]}>{lanterns.map((x, index) => <Float key={`lantern-${index}`} speed={1.15 + index * .1} floatIntensity={.08}><group position={[x, index % 2 ? .12 : -.05, 0]}><mesh position={[0, .23, -.015]}><cylinderGeometry args={[.018, .018, .55, 8]} /><meshStandardMaterial color="#d7a24d" /></mesh><mesh><boxGeometry args={[.2, .3, .07]} /><meshStandardMaterial color={on ? "#c8494e" : "#332c45"} emissive={on ? "#7f202c" : "#000000"} emissiveIntensity={on ? 1.2 : 0} /></mesh><mesh position={[0, 0, .045]}><sphereGeometry args={[.052, 12, 12]} /><meshBasicMaterial color={on ? "#ffe4a4" : "#4a4159"} /></mesh>{on && <pointLight color="#ffba67" intensity={.85} distance={1.7} />}</group></Float>)}</group><Diya position={[-2.25 * diyaScale, -1.4, -1.5]} on={on} /><Diya position={[-1.65 * diyaScale, -1.4, -1.6]} on={on} /><Diya position={[1.65 * diyaScale, -1.4, -1.6]} on={on} /><Diya position={[2.25 * diyaScale, -1.4, -1.5]} on={on} /></group>;
 }
 
 function WallCelebration({ name, lit }: { name: string; lit: boolean }) {
@@ -90,15 +100,21 @@ function CakeCutCamera({ active }: { active: boolean }) {
   return null;
 }
 
+function ResponsiveRoomDecor({ lit }: { lit: boolean }) {
+  const { size } = useThree();
+  const phone = size.width <= 480, tablet = size.width <= 850, scale = phone ? .72 : tablet ? .86 : 1;
+  const roundPositions: [number, number, number][] = phone ? [[-2.65, .7, -.8], [2.7, .5, -.8], [2.75, 1.95, -.95]] : [[-3.5, .55, -.8], [3.45, .35, -.8], [3.65, 2.2, -.95]];
+  const heartPositions: [number, number, number][] = phone ? [[-2.6, 1.9, -.8], [2.55, 1.45, -.8]] : [[-3.45, 2.1, -.8], [3.35, 1.55, -.8]];
+  return <><DiwaliLights on={lit} diyaScale={scale} /><Float speed={1.4} floatIntensity={.45}><Balloon position={roundPositions[0]} color="#f4aac2" scale={scale} /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={roundPositions[1]} color="#c8b1f4" scale={scale} /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={roundPositions[2]} color="#ffd18c" scale={scale} /></Float><HeartBalloon position={heartPositions[0]} color="#ee6f94" scale={scale} /><HeartBalloon position={heartPositions[1]} color="#f56e87" scale={scale} /></>;
+}
+
 export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, popperBurst, popperPulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; popperBurst: boolean; popperPulse: number }) {
   return <Canvas shadows camera={{ position: [4.8, 1.65, 4.8], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={[roomLit ? "#100d2a" : "#070617"]} /><fog attach="fog" args={[roomLit ? "#100d2a" : "#070617", 7, 16]} />
     <ambientLight intensity={roomLit ? .75 : .12} /><pointLight position={[0, 4, 2]} intensity={roomLit ? 55 : 3} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={roomLit ? 13 : 1} color="#bfa9ff" distance={6} /><pointLight position={[3, 2, -1]} intensity={roomLit ? 10 : 0} color="#f2a3c0" distance={5} />
     <mesh position={[0, -1.55, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 14]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
     <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[12, 7]} /><meshStandardMaterial color="#241d3e" /></mesh>
-    <mesh position={[0, -.75, .1]}><cylinderGeometry args={[1.45, 1.45, .14, 48]} /><meshStandardMaterial color="#d4a95f" metalness={.65} roughness={.25} /></mesh>
-    <CakeCutCamera active={cakeCut} /><Cake lit={candlesLit} cut={cakeCut} /><RosePetals /><DiwaliLights on={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
-    <Float speed={1.4} floatIntensity={.45}><Balloon position={[-3.5, .55, -.8]} color="#f4aac2" /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={[3.45, .35, -.8]} color="#c8b1f4" /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={[3.65, 2.2, -.95]} color="#ffd18c" /></Float><HeartBalloon position={[-3.45, 2.1, -.8]} color="#ee6f94" /><HeartBalloon position={[3.35, 1.55, -.8]} color="#f56e87" />
+    <CakeCutCamera active={cakeCut} /><ResponsiveCakeScene lit={candlesLit} cut={cakeCut} /><ResponsiveRoomDecor lit={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
     <OrbitControls target={[0, 0, 0]} enablePan={false} minDistance={4.3} maxDistance={8} maxPolarAngle={Math.PI / 2.05} />
   </Canvas>;
 }
