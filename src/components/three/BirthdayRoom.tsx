@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, OrbitControls, Sparkles, Text } from "@react-three/drei";
+import { Float, Html, OrbitControls, Sparkles, Text, useCursor } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -111,18 +111,21 @@ function ServedCakeSlice({ tiers, frosting, filling }: { tiers: CakeTiers; frost
   return <group position={[1.28, sliceHeight / 2 + .18, .68]} rotation={[0, -.48, 0]}><mesh castShadow><boxGeometry args={[.66, sliceHeight, .66]} /><meshStandardMaterial color={frosting} roughness={.42} /></mesh><mesh position={[0, -.03, .336]}><boxGeometry args={[.67, .075, .018]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh><mesh position={[0, sliceHeight / 2 + .012, 0]}><boxGeometry args={[.58, .03, .58]} /><meshStandardMaterial color={filling} roughness={.3} /></mesh></group>;
 }
 
-function Cake({ lit, cut, flavor, shape, tiers, candles }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles }) {
+function Cake({ lit, cut, flavor, shape, tiers, candles, showTooltip = false }: { lit: boolean; cut: boolean; flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; showTooltip?: boolean }) {
+  const [hovered, setHovered] = useState(false);
   const style = cakeChoices.find((cake) => cake.id === flavor)!;
   const levels = cakeLevels(tiers);
   const topY = levels[levels.length - 1].y + levels[levels.length - 1].height / 2;
   const candlePositions = shape === "heart" || candles === 1 ? [[0, topY]] : candles === 2 ? [[-.18, topY], [.18, topY]] : [[-.36, topY], [0, topY], [.36, topY]];
   const candleScale = (1 + tiers * .15) * (shape === "heart" ? 1.15 : 1);
+  useCursor(showTooltip && hovered, "pointer", "grab");
   // Sink the bevel very slightly into the platter so every shape reads as resting on it.
-  return <group position={[0, -.84, 0]}>
+  return <group position={[0, -.84, 0]} onPointerOver={showTooltip ? (event) => { event.stopPropagation(); setHovered(true); } : undefined} onPointerOut={showTooltip ? () => setHovered(false) : undefined}>
     {levels.map((level, index) => <group key={`cake-tier-${index}`} position={[0, level.y, 0]}><CakeLayer shape={shape} size={level.r} height={level.height} frosting={style.frosting} filling={style.filling} /></group>)}
     {candlePositions.map(([x, y], index) => <group key={`candle-${index}`} position={[x, y + .02 * candleScale, 0]} scale={[candleScale, candleScale, candleScale]}><mesh position={[0, .17, 0]}><cylinderGeometry args={[.062, .062, .34, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .17, .063]}><boxGeometry args={[.016, .3, .012]} /><meshBasicMaterial color="#fff4bf" /></mesh><mesh position={[0, .345, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.064, .011, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .4, 0]} color="#ff9d35" intensity={2.7} distance={2.4} /><CandleFlame index={index} tipY={.36} /></> : <><CandleSmoke index={index} puff={0} tipY={.4} /><CandleSmoke index={index} puff={1} tipY={.4} /></>}</group>)}
     {cut && <ServedCakeSlice tiers={tiers} frosting={style.frosting} filling={style.filling} />}
     {cut && <Text position={[0, topY + .68, .32]} fontSize={.12} color="#ffe7a4" anchorX="center" letterSpacing={.06}>A SLICE FOR OUR BIRTHDAY FRIEND</Text>}
+    {showTooltip && hovered && <Html position={[1.85, topY + .32, -.35]} center distanceFactor={8} style={{ pointerEvents: "none" }}><div className="cake-tooltip" role="status"><span className="cake-tooltip-tail" /><span className="cake-tooltip-avatar">🍰</span><div><strong>{style.name}</strong><span>{style.description}</span></div></div></Html>}
   </group>;
 }
 
@@ -131,7 +134,7 @@ function ResponsiveCakeScene({ lit, cut, flavor, shape, tiers, candles, petals }
   const scale = size.width <= 480 ? .68 : size.width <= 850 ? .84 : 1;
   return <group scale={[scale, size.width <= 480 ? .8 : .9, scale]}>
     <CelebrationTable />
-    <Cake lit={lit} cut={cut} flavor={flavor} shape={shape} tiers={tiers} candles={candles} />
+    <Cake lit={lit} cut={cut} flavor={flavor} shape={shape} tiers={tiers} candles={candles} showTooltip />
     <RosePetals count={petals} />
   </group>;
 }
