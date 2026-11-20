@@ -37,6 +37,6 @@ const photoCaptions = [
 ] as const;
 
 export const photoPaths: BirthdayPhoto[] = photoFiles.map((file, index) => ({
-  src: `/assets/${file}`,
+  src: `/assets/photos/${file}`,
   caption: photoCaptions[index % photoCaptions.length],
 }));
