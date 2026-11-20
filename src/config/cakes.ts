@@ -6,7 +6,7 @@ export type PetalCount = 36 | 72 | 108;
 
 export const cakeShapes: { id: CakeShape; name: string; icon: string; description: string }[] = [
   { id: "round", name: "Round", icon: "●", description: "A timeless celebration classic" },
-  { id: "heart", name: "Heart", icon: "♥", description: "Made with extra love" },
+  { id: "heart", name: "Heart", icon: "♥", description: "Made for a joyful celebration" },
   { id: "square", name: "Square", icon: "■", description: "Neat and modern" },
   { id: "rectangular", name: "Rectangular", icon: "▬", description: "Perfect for sharing" },
 ];
@@ -25,7 +25,7 @@ export const cakeCandleChoices: { id: CakeCandles; name: string }[] = [
 
 export const petalChoices: { id: PetalCount; name: string; description: string }[] = [
   { id: 36, name: "Light", description: "A delicate scatter" },
-  { id: 72, name: "Romantic", description: "A generous ring" },
+  { id: 72, name: "Festive", description: "A generous ring" },
   { id: 108, name: "Lush", description: "A full petal moment" },
 ];
 
