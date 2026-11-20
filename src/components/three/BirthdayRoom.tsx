@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, OrbitControls, Sparkles, Text } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { cakeChoices, type CakeCandles, type CakeFlavor, type CakeShape, type CakeTiers, type PetalCount } from "@/config/cakes";
 
 const outerFlameProfile = [new THREE.Vector2(0, 0), new THREE.Vector2(.075, .025), new THREE.Vector2(.09, .105), new THREE.Vector2(.055, .2), new THREE.Vector2(0, .3)];
@@ -138,8 +139,22 @@ function CakePreviewScene({ flavor, shape, tiers, candles, petals }: { flavor: C
   return <><ambientLight intensity={1.15} /><hemisphereLight args={["#ffe5c0", "#291737", 1.6]} /><spotLight position={[3.6, 5, 4]} angle={.46} penumbra={.8} intensity={60} color="#ffe0ac" castShadow /><pointLight position={[-3, 1.5, 2]} intensity={16} color="#ed8bb3" distance={5} /><group scale={[.9, .9, .9]}><CelebrationTable /><Cake lit cut={false} flavor={flavor} shape={shape} tiers={tiers} candles={candles} /><RosePetals count={petals} /></group></>;
 }
 
-export function CakePreview3D({ flavor, shape, tiers, candles, petals }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount }) {
-  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} candles={candles} petals={petals} /><OrbitControls target={[0, -.25, 0]} enablePan={false} enableZoom={false} enableDamping dampingFactor={.08} minPolarAngle={Math.PI / 3.2} maxPolarAngle={Math.PI / 1.7} /></Canvas>;
+function CakePreviewControls({ zoom }: { zoom: number }) {
+  const controls = useRef<OrbitControlsImpl>(null), previousZoom = useRef(zoom);
+  useEffect(() => {
+    const zoomChange = zoom - previousZoom.current;
+    if (!controls.current || zoomChange === 0) return;
+    const amount = Math.pow(1.22, Math.abs(zoomChange));
+    if (zoomChange > 0) controls.current.dollyOut(amount);
+    else controls.current.dollyIn(amount);
+    controls.current.update();
+    previousZoom.current = zoom;
+  }, [zoom]);
+  return <OrbitControls ref={controls} target={[0, -.25, 0]} enablePan={false} enableZoom={false} enableDamping dampingFactor={.08} minDistance={4.9} maxDistance={8.3} minPolarAngle={Math.PI / 3.2} maxPolarAngle={Math.PI / 1.7} />;
+}
+
+export function CakePreview3D({ flavor, shape, tiers, candles, petals, zoom = 0 }: { flavor: CakeFlavor; shape: CakeShape; tiers: CakeTiers; candles: CakeCandles; petals: PetalCount; zoom?: number }) {
+  return <Canvas shadows camera={{ position: [5.2, 2.1, 6], fov: 43 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CakePreviewScene flavor={flavor} shape={shape} tiers={tiers} candles={candles} petals={petals} /><CakePreviewControls zoom={zoom} /></Canvas>;
 }
 
 function Diya({ position, on, scale = 1 }: { position: [number, number, number]; on: boolean; scale?: number }) {
