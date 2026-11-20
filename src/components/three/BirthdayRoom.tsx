@@ -148,9 +148,9 @@ function Diya({ position, on, scale = 1 }: { position: [number, number, number];
 
 function DiwaliLights({ on, diyaScale = 1 }: { on: boolean; diyaScale?: number }) {
   const colors = ["#fff2ad", "#f6b8b7", "#d8c2ff", "#c8f0ec", "#ffe09a", "#f9c9d7"];
-  const ceilingBulbs = [-4.15, -3.1, -2.05, -.95, .1, 1.15, 2.15, 3.15, 4.05];
-  const lanterns = [-3.35, -2.85, 2.85, 3.35];
-  return <group><group position={[0, 3.18, -1.82]}>{ceilingBulbs.map((x, index) => <Float key={`ceiling-bulb-${index}`} speed={1.1 + index * .07} floatIntensity={.08}><group position={[x, index % 2 ? -.08 : .04, 0]}><mesh><sphereGeometry args={[.115, 16, 16]} /><meshStandardMaterial color={on ? colors[index % colors.length] : "#413956"} emissive={on ? colors[index % colors.length] : "#000000"} emissiveIntensity={on ? 2.8 : 0} /></mesh>{on && <pointLight color={colors[index % colors.length]} intensity={.65} distance={1.5} />}</group></Float>)}</group><group position={[0, 1.66, -2.18]}>{lanterns.map((x, index) => <Float key={`lantern-${index}`} speed={1.15 + index * .1} floatIntensity={.08}><group position={[x, index % 2 ? .12 : -.05, 0]}><mesh position={[0, .23, -.015]}><cylinderGeometry args={[.018, .018, .55, 8]} /><meshStandardMaterial color="#d7a24d" /></mesh><mesh><boxGeometry args={[.2, .3, .07]} /><meshStandardMaterial color={on ? "#c8494e" : "#332c45"} emissive={on ? "#7f202c" : "#000000"} emissiveIntensity={on ? 1.2 : 0} /></mesh><mesh position={[0, 0, .045]}><sphereGeometry args={[.052, 12, 12]} /><meshBasicMaterial color={on ? "#ffe4a4" : "#4a4159"} /></mesh>{on && <pointLight color="#ffba67" intensity={.85} distance={1.7} />}</group></Float>)}</group><Diya position={[-3.25 * diyaScale, -2.02, -.75]} on={on} scale={1.4} /><Diya position={[-2.65 * diyaScale, -2.02, -1.55]} on={on} scale={1.25} /><Diya position={[2.65 * diyaScale, -2.02, -1.55]} on={on} scale={1.25} /><Diya position={[3.25 * diyaScale, -2.02, -.75]} on={on} scale={1.4} /></group>;
+  const ceilingBulbs = [-6.2, -5, -3.8, -2.6, -1.3, 0, 1.3, 2.6, 3.8, 5, 6.2];
+  const lanterns = [-5.45, -4.65, 4.65, 5.45];
+  return <group><group position={[0, 3.32, -1.82]}>{ceilingBulbs.map((x, index) => <Float key={`ceiling-bulb-${index}`} speed={1.1 + index * .07} floatIntensity={.08}><group position={[x, index % 2 ? -.08 : .04, 0]}><mesh><sphereGeometry args={[.13, 16, 16]} /><meshStandardMaterial color={on ? colors[index % colors.length] : "#413956"} emissive={on ? colors[index % colors.length] : "#000000"} emissiveIntensity={on ? 2.8 : 0} /></mesh>{on && <pointLight color={colors[index % colors.length]} intensity={.75} distance={1.7} />}</group></Float>)}</group><group position={[0, 1.66, -2.18]}>{lanterns.map((x, index) => <Float key={`lantern-${index}`} speed={1.15 + index * .1} floatIntensity={.08}><group position={[x, index % 2 ? .12 : -.05, 0]}><mesh position={[0, .23, -.015]}><cylinderGeometry args={[.018, .018, .55, 8]} /><meshStandardMaterial color="#d7a24d" /></mesh><mesh><boxGeometry args={[.2, .3, .07]} /><meshStandardMaterial color={on ? "#c8494e" : "#332c45"} emissive={on ? "#7f202c" : "#000000"} emissiveIntensity={on ? 1.2 : 0} /></mesh><mesh position={[0, 0, .045]}><sphereGeometry args={[.052, 12, 12]} /><meshBasicMaterial color={on ? "#ffe4a4" : "#4a4159"} /></mesh>{on && <pointLight color="#ffba67" intensity={.85} distance={1.7} />}</group></Float>)}</group><Diya position={[-2.95 * diyaScale, -2.02, -.75]} on={on} scale={1.4} /><Diya position={[-2.35 * diyaScale, -2.02, -1.55]} on={on} scale={1.25} /><Diya position={[2.35 * diyaScale, -2.02, -1.55]} on={on} scale={1.25} /><Diya position={[2.95 * diyaScale, -2.02, -.75]} on={on} scale={1.4} /></group>;
 }
 
 function WallCelebration({ name, lit }: { name: string; lit: boolean }) {
@@ -207,8 +207,8 @@ function FountainSpark({ index, angle, lift, speed, color }: { index: number; an
 
 function SideSparkleCrackers({ active, pulse }: { active: boolean; pulse: number }) {
   return <group>
-    <group scale={[1.35, 1.35, 1.35]}><SparkleFountain position={[-2.75, -1.52, -.78]} direction={1} active={active} pulse={pulse} /></group>
-    <group scale={[1.35, 1.35, 1.35]}><SparkleFountain position={[2.75, -1.52, -.78]} direction={-1} active={active} pulse={pulse} /></group>
+    <group scale={[1.35, 1.35, 1.35]}><SparkleFountain position={[-3.35, -1.52, -.5]} direction={1} active={active} pulse={pulse} /></group>
+    <group scale={[1.35, 1.35, 1.35]}><SparkleFountain position={[3.35, -1.52, -.5]} direction={-1} active={active} pulse={pulse} /></group>
   </group>;
 }
 
