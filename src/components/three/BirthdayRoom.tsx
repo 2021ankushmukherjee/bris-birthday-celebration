@@ -15,6 +15,12 @@ function CandleFlame({ index }: { index: number }) {
   return <group ref={flame} position={[0, .19, 0]}><mesh><latheGeometry args={[outerFlameProfile, 20]} /><meshStandardMaterial color="#ff8a24" emissive="#ff5a12" emissiveIntensity={2.6} roughness={.18} /></mesh><mesh position={[0, .005, .008]}><latheGeometry args={[innerFlameProfile, 20]} /><meshBasicMaterial color="#fff2a5" /></mesh></group>;
 }
 
+function CandleSmoke({ index, puff }: { index: number; puff: number }) {
+  const smoke = useRef<THREE.Mesh>(null), material = useRef<THREE.MeshBasicMaterial>(null), startedAt = useRef<number | null>(null);
+  useFrame(({ clock }) => { if (!smoke.current || !material.current) return; if (startedAt.current === null) startedAt.current = clock.elapsedTime; const age = clock.elapsedTime - startedAt.current; const progress = Math.min(age / 3.2, 1); smoke.current.position.set(Math.sin(age * 1.8 + index + puff) * (.025 + progress * .055) + (puff - .5) * .035, .16 + progress * (.38 + puff * .12), Math.cos(age * 1.4 + index) * .025); smoke.current.scale.setScalar(.35 + progress * 1.25); material.current.opacity = (1 - progress) * .28; });
+  return <mesh ref={smoke}><sphereGeometry args={[.06, 14, 14]} /><meshBasicMaterial ref={material} color="#d7d3dc" transparent depthWrite={false} opacity={.28} /></mesh>;
+}
+
 function useBalloonPop() {
   const [popped, setPopped] = useState(false), [burstId, setBurstId] = useState(0), [burstActive, setBurstActive] = useState(false);
   const respawnTimer = useRef<number | null>(null), burstTimer = useRef<number | null>(null), reappearedAt = useRef(0);
@@ -46,9 +52,9 @@ function Cake({ lit, cut, flavor }: { lit: boolean; cut: boolean; flavor: CakeFl
   const style = cakeChoices.find((cake) => cake.id === flavor)!;
   return <group position={[0, -1.1, 0]}>
     {[{ r: 1.05, y: 0 }, { r: .77, y: .42 }, { r: .5, y: .78 }].map((x, index) => <group key={`cake-tier-${index}`} position={[0, x.y, 0]}><mesh castShadow><cylinderGeometry args={[x.r, x.r * 1.08, .42, 48]} /><meshStandardMaterial color={style.frosting} roughness={.48} /></mesh><mesh position={[0, .205, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[x.r * .92, .035, 10, 48]} /><meshStandardMaterial color={style.filling} roughness={.38} /></mesh></group>)}
-    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]}><mesh><cylinderGeometry args={[.047, .047, .23, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .118, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.049, .009, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit && <><pointLight position={[0, .22, 0]} color="#ff9d35" intensity={2.2} distance={2} /><CandleFlame index={index} /></>}</group>)}
+    {[[-.3, 1.25], [0, 1.25], [.3, 1.25]].map(([x, y], index) => <group key={`candle-${index}`} position={[x, y, 0]}><mesh><cylinderGeometry args={[.047, .047, .23, 16]} /><meshStandardMaterial color="#ff9fbb" emissive="#7e1f45" emissiveIntensity={.2} roughness={.32} /></mesh><mesh position={[0, .118, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.049, .009, 8, 16]} /><meshBasicMaterial color="#fff0a6" /></mesh>{lit ? <><pointLight position={[0, .22, 0]} color="#ff9d35" intensity={2.2} distance={2} /><CandleFlame index={index} /></> : <><CandleSmoke index={index} puff={0} /><CandleSmoke index={index} puff={1} /></>}</group>)}
     {cut && <><mesh position={[.52, .42, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.44, .42, .5]} /><meshStandardMaterial color={style.frosting} roughness={.48} /></mesh><mesh position={[.52, .64, .55]} rotation={[0, -.55, 0]}><boxGeometry args={[.45, .025, .51]} /><meshStandardMaterial color={style.filling} /></mesh></>}
-    <Text position={[0, 1.72, .03]} fontSize={.13} color="#ffe7a4" anchorX="center">{cut ? "A SLICE FOR THE BIRTHDAY GIRL" : style.name.toUpperCase()}</Text>
+    <Text position={[0, -.35, 1.28]} fontSize={.12} color="#ffe7a4" anchorX="center">{cut ? "A SLICE FOR THE BIRTHDAY GIRL" : style.name.toUpperCase()}</Text>
   </group>;
 }
 
