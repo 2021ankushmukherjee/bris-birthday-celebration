@@ -5,7 +5,8 @@ import { Float, OrbitControls, Sparkles, Text } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { cakeChoices, type CakeCandles, type CakeFlavor, type CakeShape, type CakeTiers, type PetalCount } from "@/config/cakes";
+import { cakeChoices } from "@/features/cakes/data/cake-options";
+import type { CakeCandles, CakeFlavor, CakeShape, CakeTiers, PetalCount } from "@/features/cakes/types/cake.types";
 
 const outerFlameProfile = [new THREE.Vector2(0, 0), new THREE.Vector2(.075, .025), new THREE.Vector2(.09, .105), new THREE.Vector2(.055, .2), new THREE.Vector2(0, .3)];
 const innerFlameProfile = [new THREE.Vector2(0, .01), new THREE.Vector2(.04, .035), new THREE.Vector2(.048, .1), new THREE.Vector2(.025, .17), new THREE.Vector2(0, .22)];
