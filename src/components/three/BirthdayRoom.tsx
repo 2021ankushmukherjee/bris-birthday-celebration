@@ -9,6 +9,40 @@ import { cakeChoices, type CakeFlavor } from "@/config/cakes";
 const outerFlameProfile = [new THREE.Vector2(0, 0), new THREE.Vector2(.075, .025), new THREE.Vector2(.09, .105), new THREE.Vector2(.055, .2), new THREE.Vector2(0, .3)];
 const innerFlameProfile = [new THREE.Vector2(0, .01), new THREE.Vector2(.04, .035), new THREE.Vector2(.048, .1), new THREE.Vector2(.025, .17), new THREE.Vector2(0, .22)];
 
+function ordinal(day: number) {
+  const remainder = day % 100;
+  if (remainder >= 11 && remainder <= 13) return `${day}th`;
+  const suffix = day % 10 === 1 ? "st" : day % 10 === 2 ? "nd" : day % 10 === 3 ? "rd" : "th";
+  return `${day}${suffix}`;
+}
+
+function formatLocalDateTime(date: Date) {
+  const hour = date.getHours();
+  const period = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 || 12;
+  return {
+    date: `${ordinal(date.getDate())} ${date.toLocaleString(undefined, { month: "short" })} ${date.getFullYear()}`,
+    time: `${String(displayHour).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")} ${period}`,
+  };
+}
+
+function BannerClock() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const update = () => setNow(new Date());
+    update();
+    const interval = window.setInterval(update, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const localTime = now ? formatLocalDateTime(now) : { date: "LOCAL DATE", time: "--:--:-- --" };
+  return <group>
+    <Text position={[0, 1.37, -2.37]} fontSize={.105} color="#d9bc7a" anchorX="center" letterSpacing={.12}>{localTime.date}</Text>
+    <Text position={[0, 1.16, -2.37]} fontSize={.17} color="#fff0bd" anchorX="center" letterSpacing={.06}>{localTime.time}</Text>
+  </group>;
+}
+
 function CandleFlame({ index }: { index: number }) {
   const flame = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (!flame.current) return; const sway = Math.sin(clock.elapsedTime * 7 + index * 1.8) * .11; flame.current.rotation.z = sway; flame.current.rotation.x = Math.cos(clock.elapsedTime * 5 + index) * .035; flame.current.scale.y = 1 + Math.sin(clock.elapsedTime * 9 + index) * .08; });
@@ -83,7 +117,7 @@ function WallCelebration({ name, lit }: { name: string; lit: boolean }) {
   const flowers = [
     [-2.55, .42], [-2.68, .13], [-2.55, -.16], [2.55, .42], [2.68, .13], [2.55, -.16],
   ] as const;
-  return <group><mesh position={[0, 2.02, -2.43]}><planeGeometry args={[5.55, 1.35]} /><meshStandardMaterial color="#321d4a" emissive={lit ? "#1d0d30" : "#000000"} emissiveIntensity={lit ? .8 : 0} /></mesh><mesh position={[0, 2.74, -2.42]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh position={[0, 1.3, -2.42]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh>{flowers.map(([x, y], index) => <group key={`wall-flower-${index}`} position={[x, y + 2.02, -2.39]}><mesh rotation={[0, 0, index * .6]}><torusGeometry args={[.09, .026, 10, 18]} /><meshStandardMaterial color={index % 2 ? "#f4a42b" : "#e76775"} emissive={lit ? (index % 2 ? "#9c4b0d" : "#841d32") : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh><sphereGeometry args={[.035, 10, 10]} /><meshBasicMaterial color="#ffe3a2" /></mesh></group>)}<Text position={[0, 2.25, -2.37]} fontSize={.36} color="#ffdda0" anchorX="center" letterSpacing={.08}>HAPPY BIRTHDAY</Text><Text position={[0, 1.74, -2.37]} fontSize={.5} color="#fff2dc" anchorX="center" maxWidth={5} lineHeight={.9}>{name.toUpperCase()}</Text><Text position={[0, 1.47, -2.37]} fontSize={.105} color="#f6c574" anchorX="center" letterSpacing={.15}>A NIGHT MADE JUST FOR YOU</Text></group>;
+  return <group><mesh position={[0, 1.86, -2.43]}><planeGeometry args={[5.55, 1.68]} /><meshStandardMaterial color="#321d4a" emissive={lit ? "#1d0d30" : "#000000"} emissiveIntensity={lit ? .8 : 0} /></mesh><mesh position={[0, 2.74, -2.42]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh position={[0, .98, -2.42]}><boxGeometry args={[5.7, .045, .04]} /><meshStandardMaterial color="#d8a34c" emissive={lit ? "#795018" : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh>{flowers.map(([x, y], index) => <group key={`wall-flower-${index}`} position={[x, y + 2.02, -2.39]}><mesh rotation={[0, 0, index * .6]}><torusGeometry args={[.09, .026, 10, 18]} /><meshStandardMaterial color={index % 2 ? "#f4a42b" : "#e76775"} emissive={lit ? (index % 2 ? "#9c4b0d" : "#841d32") : "#000000"} emissiveIntensity={lit ? 1 : 0} /></mesh><mesh><sphereGeometry args={[.035, 10, 10]} /><meshBasicMaterial color="#ffe3a2" /></mesh></group>)}<Text position={[0, 2.25, -2.37]} fontSize={.36} color="#ffdda0" anchorX="center" letterSpacing={.08}>HAPPY BIRTHDAY</Text><Text position={[0, 1.74, -2.37]} fontSize={.5} color="#fff2dc" anchorX="center" maxWidth={5} lineHeight={.9}>{name.toUpperCase()}</Text><BannerClock /></group>;
 }
 
 function Confetti({ index }: { index: number }) {
