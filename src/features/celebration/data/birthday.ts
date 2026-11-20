@@ -3,6 +3,14 @@ export interface BirthdayPhoto {
   caption: string;
 }
 
+export interface PartyWearOption {
+  id: string;
+  name: string;
+  description: string;
+  src: string;
+  accent: string;
+}
+
 const birthdayName = process.env.NEXT_PUBLIC_BIRTHDAY_PERSON_NAME || "Bristi";
 
 export const birthday = {
@@ -40,3 +48,16 @@ export const photoPaths: BirthdayPhoto[] = photoFiles.map((file, index) => ({
   src: `/assets/photos/${file}`,
   caption: photoCaptions[index % photoCaptions.length],
 }));
+
+export const partyWearChoices: PartyWearOption[] = [
+  { id: "birthday-rose", name: "Birthday Rose", description: "The original embroidered celebration gown.", src: "/assets/avatars/birthday-girl-cake-cutting-avatar-cartoon-transparent.png", accent: "#df5f88" },
+  { id: "emerald", name: "Emerald Bloom", description: "Satin green with golden floral embroidery.", src: "/assets/avatars/birthday-girl-emerald-party-gown.png", accent: "#14815e" },
+  { id: "royal-blue", name: "Royal Blue", description: "A sparkling one-shoulder evening look.", src: "/assets/avatars/birthday-girl-royal-blue-party-gown.png", accent: "#436dcc" },
+  { id: "champagne", name: "Champagne Pearl", description: "Soft tulle layers and pearl detailing.", src: "/assets/avatars/birthday-girl-champagne-party-gown.png", accent: "#d9ac70" },
+  { id: "purple", name: "Velvet Violet", description: "Regal velvet with crystal embroidery.", src: "/assets/avatars/birthday-girl-purple-party-gown.png", accent: "#713574" },
+  { id: "rose-gold", name: "Rose Gold", description: "Blush sequins with graceful draped sleeves.", src: "/assets/avatars/birthday-girl-rose-gold-party-gown.png", accent: "#d68a91" },
+  { id: "black", name: "Midnight Crystal", description: "A sleek black gown with a crystal cape.", src: "/assets/avatars/birthday-girl-black-party-gown.png", accent: "#7f7d96" },
+  { id: "turquoise", name: "Turquoise Lehenga", description: "Gold zardozi embroidery and a draped dupatta.", src: "/assets/avatars/birthday-girl-turquoise-lehenga.png", accent: "#36aabb" },
+  { id: "ruby", name: "Ruby Sari", description: "Silk sari with a rich gold zari border.", src: "/assets/avatars/birthday-girl-ruby-sari.png", accent: "#c73550" },
+  { id: "ivory", name: "Ivory Bloom", description: "Iridescent beading with lavender floral accents.", src: "/assets/avatars/birthday-girl-ivory-party-gown.png", accent: "#d4b8df" },
+];
