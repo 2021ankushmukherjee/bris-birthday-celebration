@@ -57,19 +57,19 @@ function Confetti({ index }: { index: number }) {
   return <mesh ref={ref}><boxGeometry args={[.035, .22, .02]} /><meshBasicMaterial color={["#ff7199", "#ffd56f", "#b99cff", "#8ee6d2", "#ef4965"][index % 5]} /></mesh>;
 }
 
-function PartyBurst({ active }: { active: boolean }) {
+function PartyBurst({ active, pulse }: { active: boolean; pulse: number }) {
   if (!active) return null;
-  return <group position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={index} index={index} />)}</group>;
+  return <group key={pulse} position={[0, -.5, 1]}>{Array.from({ length: 52 }, (_, index) => <Confetti key={index} index={index} />)}</group>;
 }
 
-export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, popperBurst }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; popperBurst: boolean }) {
+export default function BirthdayRoom({ name, roomLit, candlesLit, cakeCut, popperBurst, popperPulse }: { name: string; roomLit: boolean; candlesLit: boolean; cakeCut: boolean; popperBurst: boolean; popperPulse: number }) {
   return <Canvas shadows camera={{ position: [0, 1.3, 6.6], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={[roomLit ? "#100d2a" : "#070617"]} /><fog attach="fog" args={[roomLit ? "#100d2a" : "#070617", 7, 16]} />
     <ambientLight intensity={roomLit ? .75 : .12} /><pointLight position={[0, 4, 2]} intensity={roomLit ? 55 : 3} color="#ffca9b" distance={8} /><pointLight position={[-4, 1, -2]} intensity={roomLit ? 13 : 1} color="#bfa9ff" distance={6} /><pointLight position={[3, 2, -1]} intensity={roomLit ? 10 : 0} color="#f2a3c0" distance={5} />
     <mesh position={[0, -1.55, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 14]} /><meshStandardMaterial color="#342848" roughness={.85} /></mesh>
     <mesh position={[0, 1.6, -2.5]}><planeGeometry args={[12, 7]} /><meshStandardMaterial color="#241d3e" /></mesh>
     <mesh position={[0, -.75, .1]}><cylinderGeometry args={[1.45, 1.45, .14, 48]} /><meshStandardMaterial color="#d4a95f" metalness={.65} roughness={.25} /></mesh>
-    <Cake lit={candlesLit} cut={cakeCut} /><RosePetals /><DiwaliLights on={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
+    <Cake lit={candlesLit} cut={cakeCut} /><RosePetals /><DiwaliLights on={roomLit} /><WallCelebration name={name} lit={roomLit} /><PartyBurst active={popperBurst} pulse={popperPulse} /><Sparkles count={roomLit ? 130 : 35} scale={[8, 4, 5]} size={2} speed={.25} color="#ffe5a6" />
     <Float speed={1.4} floatIntensity={.45}><Balloon position={[-3.5, .55, -.8]} color="#f4aac2" /></Float><Float speed={1.7} floatIntensity={.4}><Balloon position={[3.45, .35, -.8]} color="#c8b1f4" /></Float><Float speed={1.2} floatIntensity={.35}><Balloon position={[3.65, 2.2, -.95]} color="#ffd18c" /></Float><HeartBalloon position={[-3.45, 2.1, -.8]} color="#ee6f94" /><HeartBalloon position={[3.35, 1.55, -.8]} color="#f56e87" />
     <OrbitControls enablePan={false} minDistance={4.3} maxDistance={8} maxPolarAngle={Math.PI / 2.05} />
   </Canvas>;
