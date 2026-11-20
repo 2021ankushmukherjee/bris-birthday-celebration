@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { birthday } from "@/config/birthday";
+import { birthday } from "@/features/celebration/data/birthday";
 
 type Remaining = { days: number; hours: number; minutes: number; seconds: number };
 const zero: Remaining = { days: 0, hours: 0, minutes: 0, seconds: 0 };
